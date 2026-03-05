@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ecb613",
+                        "background-light": "#f8f8f6",
+                        "background-dark": "#221d10",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+<title>Florizza Quiet Luxury Catalog V1</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-[430px] mx-auto shadow-2xl bg-background-light">
+<!-- Header -->
+<header class="sticky top-0 z-50 flex items-center bg-background-light/80 backdrop-blur-md p-4 justify-between border-b border-primary/10">
+<div class="flex size-10 items-center justify-center">
+<span class="material-symbols-outlined text-slate-900">menu</span>
+</div>
+<h2 class="font-serif text-2xl font-bold tracking-tight flex-1 text-center">Florizza</h2>
+<div class="flex size-10 items-center justify-end">
+<button class="relative flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-900">shopping_bag</span>
+<span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white font-bold">2</span>
+</button>
+</div>
+</header>
+<main class="flex-1 pb-24">
+<!-- Title Section -->
+<div class="px-6 pt-8 pb-4">
+<h1 class="font-serif text-4xl font-light italic text-slate-900 leading-tight">Catálogo</h1>
+<p class="text-xs uppercase tracking-[0.2em] text-slate-500 mt-2">Coleção Atemporal 2026</p>
+</div>
+<!-- Filter Controls -->
+<div class="flex gap-2 px-6 pb-6 overflow-x-auto no-scrollbar">
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary/10 border border-primary/20 px-6">
+<p class="text-slate-900 text-sm font-medium">Todos</p>
+</div>
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white border border-slate-200 px-6">
+<p class="text-slate-600 text-sm font-medium">Conjuntos</p>
+</div>
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white border border-slate-200 px-6">
+<p class="text-slate-600 text-sm font-medium">Vestidos</p>
+</div>
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white border border-slate-200 px-6">
+<p class="text-slate-600 text-sm font-medium">Acessórios</p>
+</div>
+</div>
+<!-- Sorting & View Toggle -->
+<div class="flex items-center justify-between px-6 py-2 border-y border-slate-100 mb-6">
+<div class="flex gap-6">
+<button class="flex items-center gap-1 text-xs font-bold tracking-wider uppercase text-slate-400">
+                        Preço
+                        <span class="material-symbols-outlined text-sm">unfold_more</span>
+</button>
+<button class="flex items-center gap-1 text-xs font-bold tracking-wider uppercase text-primary">
+                        Recentes
+                        <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+</button>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-300">view_list</span>
+<span class="material-symbols-outlined text-slate-900">grid_view</span>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-2 gap-x-4 gap-y-8 px-6">
+<!-- Product Card 1 -->
+<div class="flex flex-col gap-3 group">
+<div class="relative aspect-[3/4] overflow-hidden rounded-lg bg-slate-100">
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Elegant woman in cream colored linen set" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkI-odUCo3FtvqdkHR0esKqWm6NHtE77WMWM7JTgi9iBp1IGyE8nLwyp2Um8Rv7P2ppFpjw-PpcCl-4NvUA_q4jr01V8OuQZHTwXFBCQALMIWnTH8MRBGLgmv8t0RkluRKUs7DUwTcuMh8jpRzR17PkFzM-K2teiRbwvDKD5oot4-FWY878LigtKjFKMqqK25BdKunHpypypF8sDX6DxpzxnaEmEnaukwOAsQphsDckDY9gxgfupTkExHYLD-mo8aMCZSOAWrEpts"/>
+<div class="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm">
+<span class="material-symbols-outlined text-primary text-lg">star</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Conjuntos</span>
+<h3 class="font-serif text-lg text-slate-900">Linho Éthéré</h3>
+<p class="text-sm font-medium text-slate-600 mt-1">R$ 890,00</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="flex flex-col gap-3 group">
+<div class="relative aspect-[3/4] overflow-hidden rounded-lg bg-slate-100">
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Woman wearing a minimalist silk midi dress" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2AgrFUaV05Q3NPHjSNujccgGjKtLt0K3itEa8lYZWbCHGD_sYdCSq6fYgrnlTPo3U82KHlx6n2kaVCCezwb0esxpnlbl4UHOVcB5XeiRIKF-1mOm-i67Arbfz9mOZaYopc_ad4ulQNSFYwhIiwRjySK1jxs6mgllqAqIeYVV5mK6ycfAic7aFLrQm50IiWjVTbr0aPzghHf_lfwex47twxoWfqFM_Dt3XdZEN4KHoT66IeJpCB4PCclmtN-R_sb8a8N0FqhLPE18"/>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Vestidos</span>
+<h3 class="font-serif text-lg text-slate-900">Seda Minimal</h3>
+<p class="text-sm font-medium text-slate-600 mt-1">R$ 1.250,00</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex flex-col gap-3 group">
+<div class="relative aspect-[3/4] overflow-hidden rounded-lg bg-slate-100">
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="High-end blazer outfit with neutral colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuEjJQgMAs7uCQS1IaiIOUrQREvX9eBVF64D1-pImmFtbBnmzxkkPVro5lW6fcvpTQYa_ZqrTLbR1OpDmEkZhoHfDgwo1j7DO-2xUJ8Pu0UyTsulVBeD6SERg0LV7R1-zHie-odOUsdMFeYLnlsVYDKj3CX8Kbj64VrzHmWkFhypS0pBN_5Fm-vM0cw2mqkdLHXFma4ZJwodPb_1N1lGATKcGWePaR9grfBogWmncQNoWclmTvtv4RpWXzCTF2zCc4l0z2hIiwC4I"/>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Conjuntos</span>
+<h3 class="font-serif text-lg text-slate-900">Blazer Soft Wool</h3>
+<p class="text-sm font-medium text-slate-600 mt-1">R$ 1.580,00</p>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="flex flex-col gap-3 group">
+<div class="relative aspect-[3/4] overflow-hidden rounded-lg bg-slate-100">
+<img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Woman in a flowy aesthetic white dress" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAm5fuHRdkC6SINDXjJcRI_ZRcvx7QlFK8yw3DBRK3_fqDMGp4YSYQUhR8GlAsgsKg6KBAQtqFAkV6TLTqSlRjq_dyzRZPaYGzArX3bMtVc2lm3afdW4xAhOxWo2AqF-dQN4_bfpNf32fWKmfRfHAxOqkW7aUJzDTutNtC1ocRe2IZgYk95yOfaDQMRP1ll4gh5Hfq2Yz2d8PI6eiVePi97zIEaKBoVKK8ZZjK0RDqe0H8GhETNWwh0_WiiOan_pQEFdbD5StO7QEY"/>
+<div class="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm">
+<span class="material-symbols-outlined text-primary text-lg">star</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Vestidos</span>
+<h3 class="font-serif text-lg text-slate-900">Vestido Plissé</h3>
+<p class="text-sm font-medium text-slate-600 mt-1">R$ 2.100,00</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center pointer-events-none">
+<div class="w-full max-w-[430px] bg-white/90 backdrop-blur-xl border-t border-slate-100 px-6 py-3 pointer-events-auto shadow-2xl rounded-t-lg">
+<div class="flex items-center justify-between">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">search</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">favorite</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</body></html>

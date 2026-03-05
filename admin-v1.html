@@ -1,0 +1,199 @@
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a4d411",
+                        "background-light": "#f9f8f6",
+                        "background-dark": "#1d2210",
+                        "quiet-olive": "#869a4c",
+                        "quiet-gold": "#c5a059",
+                        "quiet-border": "#e1e7cf"
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 py-4 bg-background-light/80 backdrop-blur-md sticky top-0 z-10 border-b border-quiet-border/50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-quiet-olive">menu</span>
+<h2 class="serif-font text-xl font-semibold tracking-tight">Florizza Admin</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="relative">
+<span class="material-symbols-outlined text-quiet-olive">notifications</span>
+<span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary ring-2 ring-background-light"></span>
+</button>
+<div class="h-8 w-8 rounded-full bg-quiet-olive/10 flex items-center justify-center overflow-hidden border border-quiet-border">
+<img class="h-full w-full object-cover" data-alt="User profile avatar of a fashion professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNZLZucEPHuMzwHba-WVn4XJTrFoj3nwTDTuOtFyOWF61EGncnmPpweYT_wFjPieejv928AnfcG5oLZKpWkwqHmAv1UyqTfJrib52Vwo5rVqoZ6W6qXLGsoAHASEX50vCnmMkZ6j_lzBlXIlODZYj8jXZ7iV1TlNj0_jSL5GeEVqspktcRuyFiLB4fwHhmB6OVlo8_pIBKztKZlInv-ncFz2NjkgHI-0VfIxiifjiaCmQg2LIvtuG-Z2wOzS7tfpgKCfxi21i2PSE"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto px-6 pb-24 pt-6">
+<!-- Navigation Tabs -->
+<nav class="flex border-b border-quiet-border mb-8 overflow-x-auto no-scrollbar">
+<a class="flex flex-col items-center justify-center border-b-2 border-primary px-4 pb-3" href="#">
+<p class="text-sm font-bold tracking-wide">Produtos</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent px-4 pb-3 text-slate-400" href="#">
+<p class="text-sm font-medium tracking-wide">Categorias</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent px-4 pb-3 text-slate-400" href="#">
+<p class="text-sm font-medium tracking-wide">Configurações</p>
+</a>
+</nav>
+<!-- Page Title & CTA -->
+<div class="flex flex-col gap-6 mb-8">
+<h1 class="serif-font text-4xl font-light italic">Produtos</h1>
+<button class="flex items-center justify-center gap-2 bg-quiet-olive text-white rounded-lg py-3 px-6 shadow-sm active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span class="text-sm font-bold tracking-wider uppercase">Adicionar Novo Produto</span>
+</button>
+</div>
+<!-- Product List -->
+<div class="flex flex-col gap-4">
+<!-- Product Card 1 -->
+<div class="bg-white dark:bg-slate-800/50 rounded-xl p-4 shadow-sm border border-quiet-border/30 flex items-center gap-4">
+<div class="h-20 w-16 bg-slate-100 rounded-lg overflow-hidden shrink-0 border border-quiet-border/20">
+<img class="h-full w-full object-cover" data-alt="Luxury silk dress high fashion product" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJY3lmDrQ023OtqZtNtlU903cX5i2d5Ae0PwnT8aYftJLxCDpuW4IzUm0lKPBZPA_brYx6WYZgfd3KvMS0WzEMZqyUl6Pa8scEJz3uvg_DD9l0Rx5fxaWtuxB0X0X_vdPFYOUe5uzwhmB_SSJKC6zCrkVQRcKCZ0wjx-gg53bobvn0tOd8glow61gqBhlAOtRcodi6K_eNra5ihvl7X5moAK3BvTR9hYIfS_nphWtRhkCCQl_8zOn4-B6sjcAihWCDZp3uPdbWxJ8"/>
+</div>
+<div class="flex-1 flex flex-col gap-1 overflow-hidden">
+<div class="flex justify-between items-start">
+<h3 class="serif-font text-lg font-medium truncate">Vestido Seda Noir</h3>
+<span class="material-symbols-outlined text-quiet-gold text-[18px] fill-[1]">star</span>
+</div>
+<p class="text-xs text-slate-400 uppercase tracking-widest">Vestuário • R$ 2.450</p>
+<div class="flex items-center justify-between mt-2">
+<div class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-tighter">Ativo</div>
+<div class="flex gap-3 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-white dark:bg-slate-800/50 rounded-xl p-4 shadow-sm border border-quiet-border/30 flex items-center gap-4">
+<div class="h-20 w-16 bg-slate-100 rounded-lg overflow-hidden shrink-0 border border-quiet-border/20">
+<img class="h-full w-full object-cover" data-alt="Minimalist beige coat fashion product" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdJAZwiNSDoSAqqRYCOhtwpLHlWSrIM5kGHAkjuz8KaVQmzMzVuAmKQ3nII3ZBJFPe1mu8GxeFdKnADyAEjUx3US4-lTIgI5DcXNkeMh41BKHMbB3Q_6yq5vWZPjMTsUJUBG_9Xt1C732z2Oxzwg8VmZUIcFOTauk9dqbSbS8MsTi8mEjhesfwDOWzBMwfnkGEo9td4IfPDe4XyA1rT5XzxOtD7sVAH_Wzo7NA_nawlzFyvLtKtmXEJm2JoIIR-ZsuAlyushiQn9Q"/>
+</div>
+<div class="flex-1 flex flex-col gap-1 overflow-hidden">
+<div class="flex justify-between items-start">
+<h3 class="serif-font text-lg font-medium truncate">Casaco Alpaca</h3>
+<span class="material-symbols-outlined text-slate-300 text-[18px]">star</span>
+</div>
+<p class="text-xs text-slate-400 uppercase tracking-widest">Inverno • R$ 4.800</p>
+<div class="flex items-center justify-between mt-2">
+<div class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-tighter">Ativo</div>
+<div class="flex gap-3 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-white dark:bg-slate-800/50 rounded-xl p-4 shadow-sm border border-quiet-border/30 flex items-center gap-4">
+<div class="h-20 w-16 bg-slate-100 rounded-lg overflow-hidden shrink-0 border border-quiet-border/20 grayscale opacity-60">
+<img class="h-full w-full object-cover" data-alt="Designer leather shoes fashion product" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMBrok7sEmfH1vC5nIFAukXha-BctTbvkjhLl-SCyS6neRIh8GgdI50jjSK0uhUgQ-hOdcPPq8W8cwsJvuL-KpmZmM_LMdiuRbffXHECvTCfa5CJQ3oqBl_1yrTwHPipJxo8F1lXFiIzg1wU-_uJKdKOtHEmCv3YAwcEX36sXtb_SpdAU58ioiMmtsQuFKRIHAKXTHbD2axb1Dz6Fdjwns8Up56CNZZqG5c6sPcpUyc0QsfhQoIBWBFtWIW2eLB-PLHOK4dPukIhs"/>
+</div>
+<div class="flex-1 flex flex-col gap-1 overflow-hidden">
+<div class="flex justify-between items-start">
+<h3 class="serif-font text-lg font-medium truncate">Scarpin Classic</h3>
+<span class="material-symbols-outlined text-slate-300 text-[18px]">star</span>
+</div>
+<p class="text-xs text-slate-400 uppercase tracking-widest">Calçados • R$ 1.890</p>
+<div class="flex items-center justify-between mt-2">
+<div class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-tighter">Inativo</div>
+<div class="flex gap-3 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-white dark:bg-slate-800/50 rounded-xl p-4 shadow-sm border border-quiet-border/30 flex items-center gap-4">
+<div class="h-20 w-16 bg-slate-100 rounded-lg overflow-hidden shrink-0 border border-quiet-border/20">
+<img class="h-full w-full object-cover" data-alt="Premium leather handbag luxury accessory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqpzvBVd_GS16M5katA4BQDuSMcXttpWc1tm33GBGfuR8hefgv8Qznc3XRv-PIz4ECdPj_UC3zOm-ULMzsz1cRb-kC9PSOnQ4GnBTYte846E8Rgq6yNs1pA7t0RR2aO7qnjHKOkstbzj0fmaj9RNR0MIRkAuSyY3-9K4xrLPigCAGFsQY3sJnFfBENohx4npQcTPW6oZavVn_RSUvnYzCPAxJ87DeIaOeKnWq4C1wUO5SYUTGX_Hj1GNbqhzxpHQiMHG0WxaBWevw"/>
+</div>
+<div class="flex-1 flex flex-col gap-1 overflow-hidden">
+<div class="flex justify-between items-start">
+<h3 class="serif-font text-lg font-medium truncate">Bolsa Heritage</h3>
+<span class="material-symbols-outlined text-quiet-gold text-[18px] fill-[1]">star</span>
+</div>
+<p class="text-xs text-slate-400 uppercase tracking-widest">Acessórios • R$ 7.200</p>
+<div class="flex items-center justify-between mt-2">
+<div class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-tighter">Ativo</div>
+<div class="flex gap-3 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-0 left-0 right-0 flex h-auto flex-col bg-background-light/90 backdrop-blur-lg border-t border-quiet-border px-4 pb-6 pt-2 z-20">
+<div class="flex gap-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">dashboard</span>
+</div>
+<p class="text-[10px] font-medium tracking-wider uppercase">Dashboard</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-quiet-olive" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined fill-[1]">inventory_2</span>
+</div>
+<p class="text-[10px] font-bold tracking-wider uppercase">Produtos</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<p class="text-[10px] font-medium tracking-wider uppercase">Vendas</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<p class="text-[10px] font-medium tracking-wider uppercase">Ajustes</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>
