@@ -144,15 +144,63 @@ const Admin = () => {
         }
     };
 
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (mediaType === 'video') {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Atenção: O vídeo possui mais de 5MB e pode dar erro ao salvar.');
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => setFormData(prev => ({ ...prev, video: reader.result }));
+            reader.readAsDataURL(file);
+            return;
+        }
+
+        // Image compression
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const img = new Image();
+            img.src = reader.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 600;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > MAX_WIDTH) {
+                    height = Math.round((height * MAX_WIDTH) / width);
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL('image/webp', 0.6);
+
+                // Safety: reject if still too large (>150KB base64)
+                if (compressedBase64.length > 150 * 1024) {
+                    alert('Imagem muito pesada mesmo após compressão. Tente uma foto menor ou use o campo de Link/URL.');
+                    return;
+                }
+
+                setFormData(prev => ({ ...prev, images: [...prev.images, compressedBase64] }));
+            };
+        };
+        reader.readAsDataURL(file);
+    };
+
     const handleAddMediaUrl = () => {
         if (!newMediaUrl.trim()) return;
-
         if (mediaType === 'image') {
             setFormData(prev => ({ ...prev, images: [...prev.images, newMediaUrl.trim()] }));
         } else {
             setFormData(prev => ({ ...prev, video: newMediaUrl.trim() }));
         }
-        setNewMediaUrl(''); // clear input after adding
+        setNewMediaUrl('');
     };
 
     const handleRemoveImage = (e, index) => {
@@ -177,32 +225,38 @@ const Admin = () => {
         return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    // Reorder helper: takes the new sorted array and assigns clean sequential orderIndex values
+    // Reorder helper: swaps only the two affected products instead of updating all
     const applyNewOrder = async (newArr) => {
         const updates = newArr.map((product, i) => {
-            const newIdx = (newArr.length - i) * 10; // e.g. 50, 40, 30, 20, 10
+            const newIdx = (newArr.length - i) * 10;
             return { id: product.id, orderIndex: newIdx };
         });
         try {
-            for (const u of updates) {
-                await updateProduct(u.id, { orderIndex: u.orderIndex });
-            }
+            // Fire all updates in parallel for instant response
+            await Promise.all(updates.map(u => updateProduct(u.id, { orderIndex: u.orderIndex })));
         } catch (err) {
             console.error('Erro ao reordenar:', err);
         }
     };
 
-    // Move product up or down by 1 position
+    // Move product up or down by 1 position — only swap 2 items
     const moveProduct = async (productId, direction) => {
         const idx = sortedProducts.findIndex(p => p.id === productId);
         if (idx === -1) return;
         const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
         if (targetIdx < 0 || targetIdx >= sortedProducts.length) return;
 
-        const newArr = [...sortedProducts];
-        const [item] = newArr.splice(idx, 1);
-        newArr.splice(targetIdx, 0, item);
-        await applyNewOrder(newArr);
+        // Only swap the two affected products' orderIndex values
+        const a = sortedProducts[idx];
+        const b = sortedProducts[targetIdx];
+        try {
+            await Promise.all([
+                updateProduct(a.id, { orderIndex: b.orderIndex || 0 }),
+                updateProduct(b.id, { orderIndex: a.orderIndex || 0 })
+            ]);
+        } catch (err) {
+            console.error('Erro ao reordenar:', err);
+        }
     };
 
     const handleDragStart = (e, id) => {
@@ -610,19 +664,33 @@ const Admin = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row gap-3 w-full mb-8">
+                                    <div className="flex flex-col sm:flex-row gap-3 w-full mb-4">
                                         <input
                                             type="text"
                                             value={newMediaUrl}
                                             onChange={(e) => setNewMediaUrl(e.target.value)}
-                                            placeholder={`Cole aqui o link/URL da ${mediaType === 'image' ? 'nova Imagem' : 'URL do Vídeo (ex: YouTube)'}...`}
-                                            className="flex-1 p-4 border border-slate-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-black/40 dark:text-white text-sm outline-none transition-colors shadow-inner flex items-center justify-between"
+                                            placeholder={`Cole aqui o link/URL da ${mediaType === 'image' ? 'imagem' : 'vídeo'}...`}
+                                            className="flex-1 p-4 border border-slate-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-black/40 dark:text-white text-sm outline-none transition-colors shadow-inner"
                                             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddMediaUrl(); } }}
                                         />
 
                                         <button type="button" onClick={handleAddMediaUrl} className="bg-slate-900 cursor-pointer dark:bg-white/10 text-white dark:text-slate-200 px-6 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-slate-800 dark:hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg">
                                             <span className="material-symbols-outlined text-[18px]">add_link</span> Inserir Link
                                         </button>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-3 w-full mb-8">
+                                        <input
+                                            type="file"
+                                            id="mediaUpload"
+                                            className="hidden"
+                                            accept={mediaType === 'image' ? "image/*" : "video/*"}
+                                            onChange={handleFileUpload}
+                                        />
+
+                                        <label htmlFor="mediaUpload" className="bg-primary cursor-pointer text-white px-6 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-[#62b412] transition-all flex items-center justify-center gap-2 shadow-lg w-full">
+                                            <span className="material-symbols-outlined text-[18px]">add_circle</span> Importar {mediaType === 'image' ? 'Imagem do Celular' : 'Vídeo'}
+                                        </label>
                                     </div>
 
                                     {formData.video && (
