@@ -55,14 +55,16 @@ export const ProductProvider = ({ children }) => {
     // --- Product Mutations ---
     const addProduct = async (product) => {
         const { data, error } = await supabase.from('products').insert([product]).select();
-        if (!error && data) {
+        if (error) throw error;
+        if (data) {
             setProducts(prev => [data[0], ...prev]);
         }
     };
 
     const updateProduct = async (id, updatedFields) => {
         const { data, error } = await supabase.from('products').update(updatedFields).eq('id', id).select();
-        if (!error && data) {
+        if (error) throw error;
+        if (data) {
             setProducts(prev => prev.map(p => p.id === id ? data[0] : p));
         }
     };

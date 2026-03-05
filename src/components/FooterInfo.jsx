@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const FooterInfo = ({ variant = 1 }) => {
     if (variant === 1) {
         return (
@@ -5,7 +7,7 @@ const FooterInfo = ({ variant = 1 }) => {
                 <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 text-center md:text-left pt-12">
                     <div className="space-y-4">
                         <span className="text-primary text-sm font-light">01</span>
-                        <h4 className="hero-serif text-2xl">Natural Light Oasis</h4>
+                        <h4 className="hero-serif text-2xl">Natural Light <Link to="/admin" className="cursor-text text-inherit hover:text-inherit">Oasis</Link></h4>
                         <div className="w-12 h-[1px] bg-primary/30 mb-4 mx-auto md:mx-0"></div>
                         <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-light">
                             Inspirada pela leveza e pela arquitetura mediterrânea, nossa nova coleção abraça os tons naturais e a luz suave.
@@ -36,7 +38,7 @@ const FooterInfo = ({ variant = 1 }) => {
         <section className="bg-slate-50 dark:bg-[#0D0D0D] py-12 px-6 lg:px-24">
             <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left border-t border-slate-200 dark:border-slate-800 pt-12">
                 <div>
-                    <h4 className="hero-serif text-xl mb-4 italic">Natural Light Oasis</h4>
+                    <h4 className="hero-serif text-xl mb-4 italic">Natural Light <Link to="/admin" className="cursor-text text-inherit hover:text-inherit">Oasis</Link></h4>
                     <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-light">
                         Inspirada pela leveza e pela arquitetura mediterrânea, nossa nova coleção abraça os tons naturais.
                     </p>

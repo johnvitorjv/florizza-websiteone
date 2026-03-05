@@ -131,24 +131,49 @@ const Admin = () => {
         try {
             if (editingId) await updateProduct(editingId, payload);
             else await addProduct(payload);
+            setIsFormOpen(false);
         } catch (error) {
             console.error("Erro ao salvar produto no Supabase:", error);
+            alert("Erro ao salvar. Verifique se a imagem/vídeo não é muito pesada. Detalhe: " + (error.message || "Erro desconhecido"));
         } finally {
             setIsSaving(false);
-            setIsFormOpen(false);
         }
     };
 
-    // Convert file to Base64 (to mock an actual upload)
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        if (mediaType === 'video' && file.size > 5 * 1024 * 1024) {
+            alert('Atenção: O vídeo possui mais de 5MB e pode dar erro ao salvar no banco de dados gratuito.');
+        }
+
         const reader = new FileReader();
         reader.onloadend = () => {
             const base64String = reader.result;
+
             if (mediaType === 'image') {
-                setFormData(prev => ({ ...prev, images: [...prev.images, base64String] }));
+                const img = new Image();
+                img.src = base64String;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1000;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/webp', 0.7);
+                    setFormData(prev => ({ ...prev, images: [...prev.images, compressedBase64] }));
+                };
             } else {
                 setFormData(prev => ({ ...prev, video: base64String }));
             }
