@@ -7,11 +7,22 @@ import gsap from 'gsap';
 const ProductCard = ({ product, viewMode }) => {
     const defaultIndex = product.coverIndex || 0;
     const [currentImageIdx, setCurrentImageIdx] = useState(defaultIndex);
-    const { addToCart } = useProducts();
+    const { addToCart, trackEvent } = useProducts();
     const navigate = useNavigate();
     const [isAdding, setIsAdding] = useState(false);
     const btnRef = useRef(null);
     const listBtnRef = useRef(null);
+
+    // Auto crossfade images
+    useEffect(() => {
+        if (!product.images || product.images.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setCurrentImageIdx(prev => (prev + 1) % product.images.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [product.images]);
 
     const handleDotClick = (e, index) => {
         e.preventDefault();
@@ -22,15 +33,19 @@ const ProductCard = ({ product, viewMode }) => {
     return (
         <div
             onClick={() => navigate(`/produto/${product.id}`)}
-            className={`flex ${viewMode === 'list' ? 'flex-row items-center gap-6' : 'flex-col gap-4'} group cursor-pointer`}
+            className={`product-card-anim flex ${viewMode === 'list' ? 'flex-row items-center gap-6' : 'flex-col gap-4'} group cursor-pointer`}
         >
             <div className={`relative overflow-hidden rounded-md bg-[#EBE9E6] dark:bg-zinc-800 ${viewMode === 'list' ? 'w-1/3 aspect-[3/4]' : 'w-full aspect-[4/5]'}`}>
-                <img
-                    alt={product.name}
-                    src={product.images[currentImageIdx]}
-                    className="h-full w-full object-cover object-top transition-transform duration-[2000ms] group-hover:scale-110"
-                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80' }}
-                />
+                {/* Image Crossfade Layers */}
+                {product.images.map((img, idx) => (
+                    <img
+                        key={idx}
+                        alt={`${product.name} - ${idx}`}
+                        src={img}
+                        className={`absolute inset-0 h-full w-full object-cover object-top transition-all duration-1000 group-hover:scale-110 group-hover:duration-[3000ms] ${idx === currentImageIdx ? 'opacity-100 z-10' : 'opacity-0 scale-[1.02] z-0 pointer-events-none'}`}
+                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80' }}
+                    />
+                ))}
 
                 {/* Dots Pagination */}
                 {product.images.length > 1 && (
@@ -74,6 +89,7 @@ const ProductCard = ({ product, viewMode }) => {
 
                             // Impeccable Button Animation
                             setIsAdding(true);
+                            if (trackEvent) trackEvent('add_to_cart', { product_id: product.id, product_name: product.name, price: product.price });
                             gsap.timeline({
                                 onComplete: () => {
                                     addToCart(product);
@@ -109,6 +125,7 @@ const ProductCard = ({ product, viewMode }) => {
                                 e.stopPropagation();
 
                                 setIsAdding(true);
+                                if (trackEvent) trackEvent('add_to_cart', { product_id: product.id, product_name: product.name, price: product.price });
                                 gsap.timeline({
                                     onComplete: () => {
                                         addToCart(product);
@@ -131,13 +148,15 @@ const ProductCard = ({ product, viewMode }) => {
 };
 
 const Catalog = () => {
-    const { products } = useProducts();
+    const { products, trackEvent } = useProducts();
     const [filterCategory, setFilterCategory] = useState('Todos');
     const [sortBy, setSortBy] = useState('recentes'); // recentes, preco_crescente, preco_decrescente
     const [viewMode, setViewMode] = useState('grid');
     const catalogRef = useRef();
 
     useEffect(() => {
+        if (trackEvent) trackEvent('page_view', { page: 'catalogo' });
+
         // Initial entrance animation
         const tl = gsap.timeline();
 

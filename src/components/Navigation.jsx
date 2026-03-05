@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { useProducts } from '../context/ProductContext';
 import SearchModal from './SearchModal';
@@ -9,172 +9,177 @@ const Navigation = ({ toggleDark, isDark }) => {
     const navigate = useNavigate();
     const navRef = useRef();
     const { setIsCartOpen, cart } = useProducts();
-
-    const isCatalog = location.pathname === '/catalogo';
-    const isAbout = location.pathname === '/sobre';
-    const isAdmin = location.pathname === '/admin';
-    const isHome = location.pathname === '/' || location.pathname === '/v2';
-
-    // Check if we are on v1 or v2 (for mobile toggle)
-    const isV1 = location.pathname === '/';
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-    const handleNavigate = (e, path) => {
+    // Pill Navigation State
+    const navItems = [
+        { name: 'INÍCIO', path: '/' },
+        { name: 'CATÁLOGO', path: '/catalogo' },
+        { name: 'SOBRE', path: '/sobre' }
+    ];
+
+    const isAdmin = location.pathname === '/admin';
+    const isV2 = location.pathname === '/v2';
+
+    // Resolve active path for the pill (Home catches both / and /v2)
+    const getActiveIndex = () => {
+        if (location.pathname === '/sobre') return 2;
+        if (location.pathname === '/catalogo') return 1;
+        return 0; // Home is default
+    };
+
+    const activeIndex = getActiveIndex();
+    const itemsRef = useRef([]);
+    const indicatorRef = useRef(null);
+    const containerRef = useRef(null);
+
+    // Handle fluid highlight pill positioning
+    const updateIndicatorLoc = () => {
+        if (!indicatorRef.current || !itemsRef.current[activeIndex] || !containerRef.current) return;
+
+        const activeItem = itemsRef.current[activeIndex];
+        const containerLeft = containerRef.current.getBoundingClientRect().left;
+        const activeRect = activeItem.getBoundingClientRect();
+
+        gsap.to(indicatorRef.current, {
+            x: activeRect.left - containerLeft,
+            width: activeRect.width,
+            duration: 0.5,
+            ease: "power3.out"
+        });
+    };
+
+    useLayoutEffect(() => {
+        // Run once DOM is painted
+        const timer = setTimeout(updateIndicatorLoc, 50);
+        window.addEventListener('resize', updateIndicatorLoc);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', updateIndicatorLoc);
+        }
+    }, [activeIndex, location.pathname]);
+
+    const handleNavigate = (e, targetPath, index) => {
         e.preventDefault();
 
-        if (path === '/' || path === '/v2') {
-            localStorage.setItem('florizza-layout', path);
+        // If clicking the current tab, and it's not a V1/V2 swap, do nothing
+        if (activeIndex === index && !((location.pathname === '/' || isV2) && targetPath === '/v2')) {
+            if ((location.pathname === '/' || isV2) && targetPath === '/') {
+                // clicking home while on home, do nothing.
+                return;
+            }
         }
 
-        // Don't animate if we are already on the page or toggling home modes
-        if (location.pathname === path) return;
-        if ((isHome && (path === '/' || path === '/v2'))) {
-            navigate(path);
+        // If toggling between v1 and v2 or already home
+        if ((location.pathname === '/' || isV2) && (targetPath === '/' || targetPath === '/v2')) {
+            navigate(targetPath);
             return;
         }
 
+        // Animate Page Out
         const pageWrapper = document.querySelector('.page-wrapper');
         if (pageWrapper) {
             gsap.to(pageWrapper, {
                 opacity: 0,
-                y: -30,
-                duration: 0.5,
-                ease: 'power3.in',
-                onComplete: () => {
-                    navigate(path);
-                }
+                y: -15, // Subtle lift
+                duration: 0.4,
+                ease: 'power3.inOut',
+                onComplete: () => navigate(targetPath)
             });
         } else {
-            navigate(path);
+            navigate(targetPath);
         }
     };
 
-    // Toggle between V1 and V2 Home modes
+    // Toggle layouts if on home screen
     const handleToggleLayout = (e) => {
-        if (isV1) handleNavigate(e, '/v2');
-        else handleNavigate(e, '/');
+        const next = isV2 ? '/' : '/v2';
+        handleNavigate(e, next, 0);
     };
 
-    // GSAP Animation for header links entering and leaving contextually
+    // Entrance Animation
     useEffect(() => {
         if (isAdmin) return;
-
         const ctx = gsap.context(() => {
-            if (isCatalog) {
-                gsap.to('.nav-link-standard, .nav-link-about', {
-                    opacity: 0, x: 20, duration: 0.3, ease: 'power2.inOut',
-                    onComplete: () => {
-                        gsap.set('.nav-link-standard, .nav-link-about', { display: 'none' });
-                        gsap.set('.nav-link-catalog', { display: 'flex' });
-                        gsap.fromTo('.nav-link-catalog',
-                            { opacity: 0, x: -20 },
-                            { opacity: 1, x: 0, duration: 0.4, stagger: 0.1, ease: 'power2.out' }
-                        );
-                    }
-                });
-            } else if (isAbout) {
-                gsap.to('.nav-link-standard, .nav-link-catalog', {
-                    opacity: 0, x: 20, duration: 0.3, ease: 'power2.inOut',
-                    onComplete: () => {
-                        gsap.set('.nav-link-standard, .nav-link-catalog', { display: 'none' });
-                        gsap.set('.nav-link-about', { display: 'flex' });
-                        gsap.fromTo('.nav-link-about',
-                            { opacity: 0, x: -20 },
-                            { opacity: 1, x: 0, duration: 0.4, stagger: 0.1, ease: 'power2.out' }
-                        );
-                    }
-                });
-            } else {
-                gsap.to('.nav-link-catalog, .nav-link-about', {
-                    opacity: 0, x: -20, duration: 0.3, ease: 'power2.inOut',
-                    onComplete: () => {
-                        gsap.set('.nav-link-catalog, .nav-link-about', { display: 'none' });
-                        gsap.set('.nav-link-standard', { display: 'flex' });
-                        gsap.fromTo('.nav-link-standard',
-                            { opacity: 0, x: 20 },
-                            { opacity: 1, x: 0, duration: 0.4, stagger: 0.1, ease: 'power2.out' }
-                        );
-                    }
-                });
-            }
-        }, navRef);
+            gsap.fromTo(navRef.current,
+                { y: -50, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 1.5 }
+            );
+        });
         return () => ctx.revert();
-    }, [isCatalog, isAbout, isAdmin]);
+    }, [isAdmin]);
 
-    if (isAdmin) return null; // No navigation bar in Admin
+    if (isAdmin) return null;
 
     return (
-        <nav ref={navRef} className="absolute top-0 left-0 w-full z-50 px-6 md:px-8 py-6 md:py-8 flex justify-between items-center bg-transparent">
+        <nav ref={navRef} className="fixed top-0 left-0 w-full z-[80] px-4 md:px-8 py-4 md:py-6 flex justify-between items-center transition-all bg-transparent">
+
             {/* Logo */}
             <a
                 href="/"
-                onClick={(e) => handleNavigate(e, '/')}
-                className="text-xl md:text-2xl font-display font-bold tracking-[0.2em] text-primary dark:text-white uppercase cursor-pointer z-20 whitespace-nowrap"
+                onClick={(e) => handleNavigate(e, '/', 0)}
+                className="text-lg md:text-2xl font-display font-medium tracking-[0.2em] text-slate-900 dark:text-white uppercase cursor-pointer z-20 whitespace-nowrap hover:text-primary transition-colors mix-blend-difference"
             >
                 Florizza
             </a>
 
-            {/* Desktop Center Links */}
-            <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex flex-row items-center space-x-12 text-[10px] font-medium tracking-[0.3em] uppercase">
-                {/* Standard Mode Links (Home) */}
-                <a href="/" onClick={(e) => handleNavigate(e, '/')} className={`nav-link-standard hover:text-primary transition-colors cursor-pointer ${location.pathname === '/' ? 'text-primary' : ''}`}>Design v1</a>
-                <a href="/v2" onClick={(e) => handleNavigate(e, '/v2')} className={`nav-link-standard hover:text-primary transition-colors cursor-pointer ${location.pathname === '/v2' ? 'text-primary' : ''}`}>Design v2</a>
-                <a href="/catalogo" onClick={(e) => handleNavigate(e, '/catalogo')} className="nav-link-standard hover:text-primary transition-colors cursor-pointer">CATÁLOGO</a>
-                <a href="/sobre" onClick={(e) => handleNavigate(e, '/sobre')} className="nav-link-standard hover:text-primary transition-colors cursor-pointer">SOBRE</a>
+            {/* Central Floating Pill */}
+            <div
+                ref={containerRef}
+                className="absolute left-1/2 -translate-x-1/2 flex items-center p-1 bg-[#F9F8F6]/80 dark:bg-[#1A1A1A]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-full shadow-sm"
+            >
+                {/* The Sliding Highlight */}
+                <div
+                    ref={indicatorRef}
+                    className="absolute h-[calc(100%-8px)] top-1 bg-white dark:bg-white/10 rounded-full shadow-sm pointer-events-none"
+                    style={{ left: 0 }}
+                ></div>
 
-                {/* Catalog Mode Links */}
-                <a href="/" onClick={(e) => handleNavigate(e, '/')} className="nav-link-catalog hidden hover:text-primary transition-colors cursor-pointer" style={{ display: 'none', opacity: 0 }}>← INÍCIO</a>
-                <span className="nav-link-catalog hidden text-primary tracking-[0.4em] scale-110 transition-transform cursor-default" style={{ display: 'none', opacity: 0 }}>CATÁLOGO</span>
-                <a href="/sobre" onClick={(e) => handleNavigate(e, '/sobre')} className="nav-link-catalog hidden hover:text-primary transition-colors cursor-pointer" style={{ display: 'none', opacity: 0 }}>SOBRE →</a>
-
-                {/* About Mode Links */}
-                <a href="/" onClick={(e) => handleNavigate(e, '/')} className="nav-link-about hidden hover:text-primary transition-colors cursor-pointer" style={{ display: 'none', opacity: 0 }}>← INÍCIO</a>
-                <a href="/catalogo" onClick={(e) => handleNavigate(e, '/catalogo')} className="nav-link-about hidden hover:text-primary transition-colors cursor-pointer" style={{ display: 'none', opacity: 0 }}>CATÁLOGO</a>
-                <span className="nav-link-about hidden text-primary tracking-[0.4em] scale-110 transition-transform cursor-default" style={{ display: 'none', opacity: 0 }}>SOBRE</span>
+                {navItems.map((item, i) => (
+                    <a
+                        key={item.name}
+                        ref={el => itemsRef.current[i] = el}
+                        href={item.path}
+                        onClick={(e) => handleNavigate(e, item.path, i)}
+                        className={`relative z-10 px-4 md:px-6 py-2.5 text-[9px] md:text-[10px] font-semibold tracking-[0.2em] uppercase transition-colors duration-300 ${activeIndex === i
+                                ? 'text-primary dark:text-white'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                            }`}
+                    >
+                        {item.name}
+                    </a>
+                ))}
             </div>
 
-            {/* Right Tools - Mobile vs Desktop considerations */}
-            <div className="flex items-center space-x-4 md:space-x-6 z-20">
-                {/* Layout switch for Mobile (hidden on Desktop) */}
-                {isHome && (
-                    <button onClick={handleToggleLayout} className="md:hidden material-symbols-outlined text-xl hover:text-primary transition-colors" title="Limpar Layout (Alternar Tema V1/V2)">
-                        {isV1 ? 'view_agenda' : 'space_dashboard'}
+            {/* Right Tools */}
+            <div className="flex items-center space-x-3 md:space-x-6 z-20 mix-blend-difference text-white">
+                {(location.pathname === '/' || isV2) && (
+                    <button
+                        onClick={handleToggleLayout}
+                        className="hidden md:flex items-center justify-center hover:text-primary transition-colors"
+                        title="Alternar Tema V1/V2"
+                    >
+                        <span className="material-symbols-outlined text-lg">{isV2 ? 'view_agenda' : 'space_dashboard'}</span>
                     </button>
                 )}
 
                 <button
-                    title="Pesquisar"
                     onClick={() => setIsSearchOpen(true)}
-                    className="material-symbols-outlined text-xl hover:text-primary transition-colors"
+                    className="flex items-center justify-center hover:text-primary transition-colors"
                 >
-                    search
+                    <span className="material-symbols-outlined text-xl md:text-[22px]">search</span>
                 </button>
                 <button
-                    title="Sacola"
                     onClick={() => setIsCartOpen(true)}
-                    className="relative text-xl hover:text-primary transition-colors flex items-center justify-center"
+                    className="relative hover:text-primary transition-colors flex items-center justify-center"
                 >
-                    <span className="material-symbols-outlined">shopping_bag</span>
+                    <span className="material-symbols-outlined text-xl md:text-[22px]">shopping_bag</span>
                     {cart.reduce((total, item) => total + item.quantity, 0) > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] sm:text-[9px] font-bold h-3.5 w-3.5 sm:h-4 sm:w-4 flex items-center justify-center rounded-full border border-white dark:border-zinc-900">
+                        <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] sm:text-[9px] font-bold h-3.5 w-3.5 sm:h-4 sm:w-4 flex items-center justify-center rounded-full border border-white dark:border-zinc-900 shadow-sm">
                             {cart.reduce((total, item) => total + item.quantity, 0)}
                         </span>
                     )}
                 </button>
-                <button title="Modo Noturno" onClick={toggleDark} className="material-symbols-outlined text-xl hover:text-primary transition-colors">
-                    {isDark ? 'light_mode' : 'dark_mode'}
-                </button>
-
-                {/* Burger for mobile 'Sobre', 'Inicio' e 'Catalogo' when out of space */}
-                <div className="md:hidden relative group">
-                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="material-symbols-outlined text-xl hover:text-primary pt-1">menu</button>
-                    <div className={`absolute right-0 top-full mt-2 w-48 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-md shadow-lg transition-opacity flex flex-col p-2 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-                        <a href="/" onClick={(e) => { setMobileMenuOpen(false); handleNavigate(e, '/'); }} className={`text-sm p-3 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded ${isHome ? 'text-primary' : ''}`}>Início</a>
-                        <a href="/catalogo" onClick={(e) => { setMobileMenuOpen(false); handleNavigate(e, '/catalogo'); }} className={`text-sm p-3 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded ${isCatalog ? 'text-primary' : ''}`}>Catálogo</a>
-                        <a href="/sobre" onClick={(e) => { setMobileMenuOpen(false); handleNavigate(e, '/sobre'); }} className={`text-sm p-3 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded ${isAbout ? 'text-primary' : ''}`}>Sobre</a>
-                    </div>
-                </div>
             </div>
 
             <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

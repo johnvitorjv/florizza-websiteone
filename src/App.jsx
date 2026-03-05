@@ -11,13 +11,7 @@ import CartDrawer from './components/CartDrawer';
 import { ProductProvider, useProducts } from './context/ProductContext';
 import Intro from './components/Intro';
 
-const RootRoute = () => {
-  const savedLayout = localStorage.getItem('florizza-layout');
-  if (savedLayout === '/v2') {
-    return <Navigate to="/v2" replace />;
-  }
-  return <Home variant={1} />;
-};
+
 
 const AppRoutes = ({ toggleDark, isDark }) => {
   const { loading } = useProducts();
@@ -47,8 +41,8 @@ const AppRoutes = ({ toggleDark, isDark }) => {
     <>
       <Navigation toggleDark={toggleDark} isDark={isDark} />
       <Routes>
-        <Route path="/" element={<RootRoute />} />
-        <Route path="/v2" element={<Home variant={2} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/v2" element={<Home />} />
         <Route path="/catalogo" element={<Catalog />} />
         <Route path="/produto/:id" element={<ProductDetails />} />
         <Route path="/checkout" element={<Checkout />} />

@@ -5,9 +5,11 @@ import { ChevronLeft, Check, Truck, MapPin, Store } from 'lucide-react';
 import gsap from 'gsap';
 
 const Checkout = () => {
-    const { cart, clearCart, settings } = useProducts();
+    const { cart, clearCart, settings, trackEvent } = useProducts();
     const navigate = useNavigate();
     const pageRef = useRef(null);
+    const btnRef = useRef(null);
+    const [isCompleting, setIsCompleting] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -38,11 +40,18 @@ const Checkout = () => {
             return;
         }
 
+        if (trackEvent) {
+            trackEvent('checkout_started', {
+                cart_value: cart.reduce((acc, item) => acc + (item.price * item.quantity), 0),
+                items_count: cart.length
+            });
+        }
+
         gsap.fromTo(pageRef.current,
             { opacity: 0, y: 30 },
             { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
         );
-    }, [cart, navigate]);
+    }, [cart, navigate, trackEvent]);
 
     // Handle form input
     const handleChange = (e) => {
@@ -110,14 +119,41 @@ const Checkout = () => {
         return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     };
 
-    // WhatsApp Order Generation
-    const handleSubmit = (e) => {
+    // Form submit animation intercept
+    const handleActionSubmit = (e) => {
         e.preventDefault();
 
         if (!selectedShipping) {
             alert('Por favor, selecione um método de entrega.');
             return;
         }
+
+        // Ensure form validation passes before animating
+        const form = document.getElementById('checkout-form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        setIsCompleting(true);
+
+        if (trackEvent) {
+            trackEvent('checkout_completed', {
+                total_value: cart.reduce((acc, item) => acc + (item.price * item.quantity), 0),
+                shipping_method: selectedShipping
+            });
+        }
+
+        gsap.timeline({
+            onComplete: () => handleSubmit() // run the actual logic after animation
+        })
+            .to(btnRef.current, { scale: 0.95, backgroundColor: '#62b412', duration: 0.15, ease: 'power2.inOut' })
+            .to(btnRef.current, { scale: 1.04, duration: 0.6, ease: 'elastic.out(1.2, 0.4)' })
+            .to(btnRef.current, { scale: 1, duration: 0.2 });
+    };
+
+    // WhatsApp Order Generation
+    const handleSubmit = () => {
 
         const orderId = Math.random().toString(36).substr(2, 6).toUpperCase();
 
@@ -333,11 +369,14 @@ const Checkout = () => {
                                 </div>
 
                                 <button
+                                    ref={btnRef}
                                     type="submit"
-                                    form="checkout-form"
-                                    className="w-full py-5 bg-primary text-white text-xs font-bold tracking-[0.2em] uppercase rounded-sm hover:bg-[#62b412] hover:shadow-lg transition-all transform hover:-translate-y-1 active:scale-95"
+                                    onClick={handleActionSubmit}
+                                    className={`w-full py-5 text-white text-xs font-bold tracking-[0.2em] uppercase rounded-sm transition-all shadow-md flex items-center justify-center gap-2 ${isCompleting ? 'bg-[#82cf17] shadow-[0_0_20px_rgba(130,207,23,0.4)] pointer-events-none' : 'bg-primary hover:bg-[#62b412] active:scale-95'}`}
                                 >
-                                    Finalizar no WhatsApp
+                                    {isCompleting ? (
+                                        <> <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Processando... </>
+                                    ) : 'Finalizar no WhatsApp'}
                                 </button>
 
                                 <p className="text-[10px] text-center text-slate-400 mt-4 px-4 leading-relaxed uppercase tracking-wider">

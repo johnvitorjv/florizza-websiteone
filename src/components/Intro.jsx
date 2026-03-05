@@ -11,83 +11,69 @@ const Intro = ({ onComplete }) => {
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
-        const tl = gsap.timeline({
-            onComplete: () => {
-                // Smoothly fade out the entire intro screen
-                gsap.to(containerRef.current, {
-                    opacity: 0,
-                    duration: 1.2,
-                    ease: "power2.inOut",
-                    onComplete: () => {
-                        setIsVisible(false);
-                        if (onComplete) onComplete();
-                    }
-                });
-            }
-        });
+        const ctx = gsap.context(() => {
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    gsap.to(containerRef.current, {
+                        opacity: 0,
+                        duration: 1.2,
+                        ease: "power2.inOut",
+                        onComplete: () => {
+                            setIsVisible(false);
+                            if (onComplete) onComplete();
+                        }
+                    });
+                }
+            });
 
-        // 1. Setup initial states
-        // Hide elements initially
-        gsap.set(titleWrapperRef.current, { autoAlpha: 1 });
-        // The text will be revealed from bottom to top using clipPath
-        gsap.set(titleRef.current, { y: 100, opacity: 0, scale: 0.95, filter: "blur(10px)" });
-        gsap.set([subtitleRef.current, phraseRef.current], { opacity: 0, y: 20 });
-        gsap.set(glowRef.current, { scale: 0.8, opacity: 0 });
+            gsap.set(titleWrapperRef.current, { autoAlpha: 1 });
+            gsap.set(titleRef.current, { y: 100, opacity: 0, scale: 0.95, filter: "blur(10px)", backgroundPosition: "300% center" });
+            gsap.set([subtitleRef.current, phraseRef.current], { opacity: 0, y: 20 });
+            gsap.set(glowRef.current, { scale: 0.8, opacity: 0 });
 
-        // 2. Ambient Glow Animation
-        // A breathtaking glowing orb that moves and breathes slowly
-        tl.to(glowRef.current, {
-            scale: 1.5,
-            opacity: 0.4, // subtle glow
-            duration: 3,
-            ease: "power2.out"
-        }, 0);
+            tl.to(glowRef.current, {
+                scale: 1.5,
+                opacity: 0.4,
+                duration: 3,
+                ease: "power2.out"
+            }, 0);
 
-        // Continuous floating animation for the glow (not blocking the timeline)
-        gsap.to(glowRef.current, {
-            y: -50,
-            x: 30,
-            rotation: 10,
-            duration: 4,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut"
-        });
+            gsap.to(glowRef.current, {
+                y: -50,
+                x: 30,
+                rotation: 10,
+                duration: 4,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
 
-        // 3. Cinematic Title Reveal
-        // Title rises up, scales slightly, and unblurs
-        tl.to(titleRef.current, {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            filter: "blur(0px)",
-            duration: 1.8,
-            ease: "power3.out"
-        }, 0.5); // Starts a bit after the glow
+            tl.to(titleRef.current, {
+                y: 0,
+                opacity: 1,
+                scale: 1,
+                filter: "blur(0px)",
+                duration: 1.8,
+                ease: "power3.out"
+            }, 0.5);
 
-        // Light sweep across the text using background-position
-        tl.fromTo(titleRef.current,
-            { backgroundPosition: "200% center" },
-            { backgroundPosition: "-200% center", duration: 2.5, ease: "power1.inOut" },
-            1.0 // Starts during the title reveal
-        );
+            tl.to(titleRef.current,
+                { backgroundPosition: "-300% center", duration: 2.8, ease: "power1.inOut" },
+                1.0
+            );
 
-        // 4. Subtitle and Phrase elegant fade in
-        tl.to([subtitleRef.current, phraseRef.current], {
-            opacity: 1,
-            y: 0,
-            duration: 1.2,
-            stagger: 0.3,
-            ease: "power2.out"
-        }, 1.5);
+            tl.to([subtitleRef.current, phraseRef.current], {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                stagger: 0.3,
+                ease: "power2.out"
+            }, 1.5);
 
-        // 5. Hold period to admire the beauty
-        tl.to({}, { duration: 2.0 });
+            tl.to({}, { duration: 2.0 });
+        }, containerRef);
 
-        return () => {
-            tl.kill();
-            gsap.killTweensOf(glowRef.current);
-        };
+        return () => ctx.revert();
     }, [onComplete]);
 
     if (!isVisible) return null;
@@ -116,8 +102,8 @@ const Intro = ({ onComplete }) => {
                         className="font-display text-5xl md:text-7xl lg:text-8xl tracking-[0.2em] font-bold mb-2 text-transparent bg-clip-text"
                         style={{
                             backgroundImage: 'linear-gradient(to right, rgba(115,207,23,1) 0%, rgba(115,207,23,0.4) 45%, rgba(255,255,255,1) 50%, rgba(115,207,23,0.4) 55%, rgba(115,207,23,1) 100%)',
-                            backgroundSize: '200% auto',
-                            color: 'transparent' // Fallback handled by tailwind classes usually, but explicit here
+                            backgroundSize: '300% auto',
+                            color: 'transparent'
                         }}
                     >
                         FLORIZZA

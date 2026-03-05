@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Instagram, Phone, MapPin } from 'lucide-react';
+import { useProducts } from '../context/ProductContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,8 +10,13 @@ const About = () => {
     const pageRef = useRef();
     const carouselRef = useRef();
     const mainImgRef = useRef();
+    const { trackEvent } = useProducts();
 
     useEffect(() => {
+        if (trackEvent) {
+            trackEvent('page_view', { page: 'sobre' });
+        }
+
         // Initial load animation for hero section
         gsap.fromTo(pageRef.current,
             { opacity: 0 },

@@ -140,12 +140,30 @@ export const ProductProvider = ({ children }) => {
 
     const clearCart = () => setCart([]);
 
+    // --- Analytics Tracking ---
+    const trackEvent = async (eventType, eventData = {}) => {
+        try {
+            // Include session id or user id if available in the future
+            const payload = {
+                event_type: eventType,
+                event_data: eventData,
+                url: window.location.pathname
+            };
+            // This table needs to be created in Supabase: analytics_events
+            await supabase.from('analytics_events').insert([payload]);
+        } catch (error) {
+            console.error('Analytics error:', error);
+            // Non-blocking, fail silently for user
+        }
+    };
+
     return (
         <ProductContext.Provider value={{
             products, addProduct, updateProduct, deleteProduct, loading,
             categories, addCategory, deleteCategory,
             settings, updateSettings,
-            cart, isCartOpen, setIsCartOpen, addToCart, removeFromCart, updateCartItemQuantity, clearCart
+            cart, isCartOpen, setIsCartOpen, addToCart, removeFromCart, updateCartItemQuantity, clearCart,
+            trackEvent
         }}>
             {children}
         </ProductContext.Provider>

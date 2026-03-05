@@ -74,6 +74,10 @@ const Admin = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [editingId, setEditingId] = useState(null);
+
+    // Drag & Drop State
+    const [draggedId, setDraggedId] = useState(null);
+    const [dragOverId, setDragOverId] = useState(null);
     const [formData, setFormData] = useState({
         name: '', category: categories[0] || 'Conjunto', price: '', description: '',
         images: [], video: '', coverIndex: 0, stock: 1, orderIndex: 0,
@@ -199,9 +203,70 @@ const Admin = () => {
     };
 
     const sortedProducts = [...products].sort((a, b) => {
+        if (a.featured !== b.featured) return b.featured ? 1 : -1;
         if (a.orderIndex !== b.orderIndex) return b.orderIndex - a.orderIndex;
         return new Date(b.createdAt) - new Date(a.createdAt);
     });
+
+    const handleDragStart = (e, id) => {
+        setDraggedId(id);
+        e.dataTransfer.effectAllowed = "move";
+        // Ghost effect
+        setTimeout(() => { if (e.target) e.target.style.opacity = '0.4'; }, 0);
+    };
+
+    const handleDragOver = (e, id) => {
+        e.preventDefault();
+        if (draggedId === id) return;
+        setDragOverId(id);
+    };
+
+    const handleDragEnd = (e) => {
+        e.target.style.opacity = '1';
+        setDraggedId(null);
+        setDragOverId(null);
+    };
+
+    const handleDrop = async (e, droppedOnId) => {
+        e.preventDefault();
+        if (!draggedId || draggedId === droppedOnId) {
+            setDraggedId(null); setDragOverId(null); return;
+        }
+
+        const draggedIndex = sortedProducts.findIndex(p => p.id === draggedId);
+        const droppedOnIndex = sortedProducts.findIndex(p => p.id === droppedOnId);
+        if (draggedIndex === -1 || droppedOnIndex === -1) return;
+
+        const draggedItem = sortedProducts[draggedIndex];
+        const droppedOnItem = sortedProducts[droppedOnIndex];
+
+        // Ensure we don't mix featured and non-featured bounds if we want strict separation, 
+        // but physically putting a non-featured between two featured should either make it featured or just float above.
+        // For simplicity, we just calculate the new orderIndex visually.
+
+        const newArr = [...sortedProducts];
+        newArr.splice(draggedIndex, 1);
+        newArr.splice(droppedOnIndex, 0, draggedItem);
+
+        const prevItem = newArr[droppedOnIndex - 1];
+        const nextItem = newArr[droppedOnIndex + 1];
+
+        let newOrder = 0;
+        if (prevItem && nextItem) newOrder = (prevItem.orderIndex + nextItem.orderIndex) / 2;
+        else if (prevItem) newOrder = prevItem.orderIndex - 10;
+        else if (nextItem) newOrder = nextItem.orderIndex + 10;
+        else newOrder = 0;
+
+        setDraggedId(null);
+        setDragOverId(null);
+
+        // Update single product optimally
+        try {
+            await updateProduct(draggedId, { orderIndex: newOrder });
+        } catch (err) {
+            console.error("Erro ao reordenar", err);
+        }
+    };
 
     // ----------------------------------------------------
     // RENDER LOGIN SCREEN
@@ -346,8 +411,24 @@ const Admin = () => {
                             {sortedProducts.map(product => {
                                 const coverImage = product.images?.[product.coverIndex || 0] || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80';
                                 return (
-                                    <div key={product.id} className="bg-white/80 backdrop-blur-xl dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.04] p-6 rounded-3xl flex flex-col sm:flex-row items-center gap-8 group hover:border-primary/40 dark:hover:border-primary/30 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl">
-                                        <div className="relative overflow-hidden rounded-2xl w-full sm:w-32 h-40 shrink-0 shadow-lg group-hover:shadow-primary/20 transition-all">
+                                    <div
+                                        key={product.id}
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, product.id)}
+                                        onDragOver={(e) => handleDragOver(e, product.id)}
+                                        onDrop={(e) => handleDrop(e, product.id)}
+                                        onDragEnd={handleDragEnd}
+                                        className={`bg-white/80 backdrop-blur-xl dark:bg-white/[0.02] border p-6 rounded-3xl flex flex-col sm:flex-row items-center gap-8 group transition-all duration-500 cursor-grab active:cursor-grabbing ${dragOverId === product.id ? 'border-primary border-t-4 shadow-2xl scale-[1.02] dark:bg-primary/5' : 'border-slate-200 dark:border-white/[0.04] shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl hover:border-primary/40 dark:hover:border-primary/30'}`}
+                                    >
+                                        <div className="hidden sm:flex items-center justify-center text-slate-300 hover:text-primary transition-colors pr-2">
+                                            <span className="material-symbols-outlined drag-handle cursor-grab active:cursor-grabbing">drag_indicator</span>
+                                        </div>
+                                        <div className="relative overflow-hidden rounded-2xl w-full sm:w-32 h-40 shrink-0 shadow-lg group-hover:shadow-primary/20 transition-all pointer-events-none">
+                                            {product.featured && (
+                                                <div className="absolute top-2 left-2 z-10 bg-amber-500 text-white rounded-full p-1 shadow-md">
+                                                    <Star size={12} fill="currentColor" />
+                                                </div>
+                                            )}
                                             <img alt={product.name} className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110" src={coverImage} />
                                             <div className="absolute inset-0 ring-1 ring-inset ring-black/5 dark:ring-white/10 rounded-2xl"></div>
                                         </div>
