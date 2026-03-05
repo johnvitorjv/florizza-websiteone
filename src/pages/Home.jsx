@@ -142,23 +142,28 @@ const Home = () => {
     // V2 SCREEN — NOW IN PORTUGUESE + LIGHT MODE + MOBILE FIXED
     // ────────────────────────────────────────────
     const ScreenTwo = () => {
-        // V2 always has dark overlay over image, so text is always white
-        const textColor = 'text-white';
-        const subTextColor = 'text-slate-300';
-        const overlayMobile = 'bg-black/40';
-        const btnBg = 'bg-white';
-        const btnText = 'text-black';
-        const waColor = 'text-slate-300';
-        const waLine = 'bg-slate-600';
-        const toggleColor = 'text-slate-400 hover:text-white';
+        const isDark = document.documentElement.classList.contains('dark');
+        const bgColor = isDark ? 'bg-black' : 'bg-[#fcfbf9]';
+        const textColor = isDark ? 'text-white' : 'text-slate-900';
+        const subTextColor = isDark ? 'text-slate-300' : 'text-slate-600';
+        const overlayMobile = isDark ? 'bg-black/40' : 'bg-[#fcfbf9]/95';
+        const overlayDesktop = isDark ? 'bg-black/10' : 'bg-white/5';
+        const gradientFrom = isDark ? 'from-black' : 'from-[#fcfbf9]';
+        const btnBg = isDark ? 'bg-white' : 'bg-slate-900';
+        const btnText = isDark ? 'text-black' : 'text-white';
+        const waColor = isDark ? 'text-slate-300' : 'text-slate-500';
+        const waLine = isDark ? 'bg-slate-700' : 'bg-slate-300';
+        const toggleColor = isDark ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-900';
+        const detailColor = isDark ? 'text-slate-500' : 'text-slate-400';
+        const detailLine = isDark ? 'bg-slate-700' : 'bg-slate-200';
 
         return (
             <div className="absolute inset-0 w-full min-h-screen" ref={v2Ref} style={{ zIndex: 1 }}>
-                <main className="relative min-h-screen flex bg-black overflow-hidden page-wrapper">
+                <main className={`relative min-h-screen flex ${bgColor} overflow-hidden page-wrapper`}>
 
                     {/* Left Side */}
                     <div className="w-full lg:w-1/2 min-h-screen flex items-center relative z-20">
-                        <div className="absolute inset-0 z-0" style={{ background: 'linear-gradient(to right, #000 0%, rgba(0,0,0,0.6) 40%, transparent 100%)' }} />
+                        <div className={`absolute inset-0 z-0 bg-gradient-to-r ${gradientFrom} via-transparent lg:to-transparent`} />
 
                         <div className="animate-in container mx-auto px-6 md:px-12 lg:px-24 flex flex-col justify-center relative z-10 w-full h-full pt-24 pb-16 lg:pt-0 lg:pb-0">
                             <div className="max-w-xl">
@@ -190,8 +195,8 @@ const Home = () => {
                                 </button>
                             </div>
 
-                            <div className="absolute bottom-8 left-6 md:left-12 lg:left-24 hidden lg:flex items-center space-x-6 text-[9px] uppercase tracking-widest text-slate-500">
-                                <span className="w-12 h-[1px] bg-slate-700" />
+                            <div className={`absolute bottom-8 left-6 md:left-12 lg:left-24 hidden lg:flex items-center space-x-6 text-[9px] uppercase tracking-widest ${detailColor}`}>
+                                <span className={`w-12 h-[1px] ${detailLine}`} />
                                 <span>SS/26 Exclusives</span>
                             </div>
                         </div>
@@ -201,13 +206,13 @@ const Home = () => {
                     <div className="absolute lg:relative inset-y-0 right-0 w-full lg:w-1/2 h-screen z-0">
                         <div className="w-full h-full overflow-hidden">
                             <HeroSlider variant={2} />
-                            <div className={`absolute inset-0 ${overlayMobile} lg:bg-black/10 pointer-events-none z-10`} />
-                            <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+                            <div className={`absolute inset-0 ${overlayMobile} lg:${overlayDesktop} pointer-events-none z-10`} />
+                            <div className={`hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r ${gradientFrom} to-transparent z-10 pointer-events-none`} />
                         </div>
                     </div>
                 </main>
 
-                <div className="bg-black">
+                <div className={bgColor}>
                     <FooterInfo variant={2} />
                 </div>
             </div>
