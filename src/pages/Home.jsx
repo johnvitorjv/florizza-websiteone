@@ -163,7 +163,7 @@ const Home = () => {
 
                     {/* Left Side */}
                     <div className="w-full lg:w-1/2 min-h-screen flex items-center relative z-20">
-                        <div className={`absolute inset-0 z-0 bg-gradient-to-r ${gradientFrom} via-${isDark ? 'transparent' : '[#fcfbf9]/80'} lg:via-transparent lg:to-transparent`} />
+                        <div className={`absolute inset-0 z-0 bg-gradient-to-r ${gradientFrom} via-${isDark ? 'transparent' : '[#fcfbf9]/40 30%'} lg:via-transparent lg:to-transparent`} />
 
                         <div className="animate-in container mx-auto px-6 md:px-12 lg:px-24 flex flex-col justify-center relative z-10 w-full h-full pt-24 pb-16 lg:pt-0 lg:pb-0">
                             <div className="max-w-xl">
@@ -207,7 +207,6 @@ const Home = () => {
                         <div className="w-full h-full overflow-hidden">
                             <HeroSlider variant={2} />
                             <div className={`absolute inset-0 ${overlayMobile} lg:${overlayDesktop} pointer-events-none z-10`} />
-                            {!isDark && <div className="absolute inset-0 bg-gradient-to-b from-[#fcfbf9]/40 via-transparent to-transparent lg:hidden z-10 pointer-events-none" />}
                             <div className={`hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r ${gradientFrom} via-${isDark ? 'transparent' : '[#fcfbf9]/50'} to-transparent z-10 pointer-events-none`} />
                         </div>
                     </div>
