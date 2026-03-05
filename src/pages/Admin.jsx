@@ -203,15 +203,41 @@ const Admin = () => {
     };
 
     const sortedProducts = [...products].sort((a, b) => {
-        if (a.featured !== b.featured) return b.featured ? 1 : -1;
-        if (a.orderIndex !== b.orderIndex) return b.orderIndex - a.orderIndex;
+        if (a.orderIndex !== b.orderIndex) return (b.orderIndex || 0) - (a.orderIndex || 0);
         return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
+    // Reorder helper: takes the new sorted array and assigns clean sequential orderIndex values
+    const applyNewOrder = async (newArr) => {
+        const updates = newArr.map((product, i) => {
+            const newIdx = (newArr.length - i) * 10; // e.g. 50, 40, 30, 20, 10
+            return { id: product.id, orderIndex: newIdx };
+        });
+        try {
+            for (const u of updates) {
+                await updateProduct(u.id, { orderIndex: u.orderIndex });
+            }
+        } catch (err) {
+            console.error('Erro ao reordenar:', err);
+        }
+    };
+
+    // Move product up or down by 1 position
+    const moveProduct = async (productId, direction) => {
+        const idx = sortedProducts.findIndex(p => p.id === productId);
+        if (idx === -1) return;
+        const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+        if (targetIdx < 0 || targetIdx >= sortedProducts.length) return;
+
+        const newArr = [...sortedProducts];
+        const [item] = newArr.splice(idx, 1);
+        newArr.splice(targetIdx, 0, item);
+        await applyNewOrder(newArr);
+    };
+
     const handleDragStart = (e, id) => {
         setDraggedId(id);
-        e.dataTransfer.effectAllowed = "move";
-        // Ghost effect
+        e.dataTransfer.effectAllowed = 'move';
         setTimeout(() => { if (e.target) e.target.style.opacity = '0.4'; }, 0);
     };
 
@@ -237,35 +263,14 @@ const Admin = () => {
         const droppedOnIndex = sortedProducts.findIndex(p => p.id === droppedOnId);
         if (draggedIndex === -1 || droppedOnIndex === -1) return;
 
-        const draggedItem = sortedProducts[draggedIndex];
-        const droppedOnItem = sortedProducts[droppedOnIndex];
-
-        // Ensure we don't mix featured and non-featured bounds if we want strict separation, 
-        // but physically putting a non-featured between two featured should either make it featured or just float above.
-        // For simplicity, we just calculate the new orderIndex visually.
-
         const newArr = [...sortedProducts];
-        newArr.splice(draggedIndex, 1);
+        const [draggedItem] = newArr.splice(draggedIndex, 1);
         newArr.splice(droppedOnIndex, 0, draggedItem);
-
-        const prevItem = newArr[droppedOnIndex - 1];
-        const nextItem = newArr[droppedOnIndex + 1];
-
-        let newOrder = 0;
-        if (prevItem && nextItem) newOrder = (prevItem.orderIndex + nextItem.orderIndex) / 2;
-        else if (prevItem) newOrder = prevItem.orderIndex - 10;
-        else if (nextItem) newOrder = nextItem.orderIndex + 10;
-        else newOrder = 0;
 
         setDraggedId(null);
         setDragOverId(null);
 
-        // Update single product optimally
-        try {
-            await updateProduct(draggedId, { orderIndex: newOrder });
-        } catch (err) {
-            console.error("Erro ao reordenar", err);
-        }
+        await applyNewOrder(newArr);
     };
 
     // ----------------------------------------------------
@@ -420,8 +425,14 @@ const Admin = () => {
                                         onDragEnd={handleDragEnd}
                                         className={`bg-white/80 backdrop-blur-xl dark:bg-white/[0.02] border p-6 rounded-3xl flex flex-col sm:flex-row items-center gap-8 group transition-all duration-500 cursor-grab active:cursor-grabbing ${dragOverId === product.id ? 'border-primary border-t-4 shadow-2xl scale-[1.02] dark:bg-primary/5' : 'border-slate-200 dark:border-white/[0.04] shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl hover:border-primary/40 dark:hover:border-primary/30'}`}
                                     >
-                                        <div className="hidden sm:flex items-center justify-center text-slate-300 hover:text-primary transition-colors pr-2">
-                                            <span className="material-symbols-outlined drag-handle cursor-grab active:cursor-grabbing">drag_indicator</span>
+                                        <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-0 pr-2">
+                                            <button onClick={() => moveProduct(product.id, 'up')} className="p-1 rounded hover:bg-primary/10 text-slate-400 hover:text-primary transition-all" title="Mover para cima">
+                                                <span className="material-symbols-outlined text-lg">expand_less</span>
+                                            </button>
+                                            <span className="material-symbols-outlined drag-handle cursor-grab active:cursor-grabbing text-slate-300 hover:text-primary transition-colors hidden sm:block">drag_indicator</span>
+                                            <button onClick={() => moveProduct(product.id, 'down')} className="p-1 rounded hover:bg-primary/10 text-slate-400 hover:text-primary transition-all" title="Mover para baixo">
+                                                <span className="material-symbols-outlined text-lg">expand_more</span>
+                                            </button>
                                         </div>
                                         <div className="relative overflow-hidden rounded-2xl w-full sm:w-32 h-40 shrink-0 shadow-lg group-hover:shadow-primary/20 transition-all pointer-events-none">
                                             {product.featured && (

@@ -58,14 +58,14 @@ const CartDrawer = () => {
             {/* Overlay */}
             <div
                 ref={overlayRef}
-                className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-50 hidden opacity-0"
+                className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-[90] hidden opacity-0"
                 onClick={() => setIsCartOpen(false)}
             />
 
             {/* Drawer */}
             <div
                 ref={drawerRef}
-                className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-zinc-950 shadow-2xl z-50 transform translate-x-full flex flex-col border-l border-slate-100 dark:border-white/5"
+                className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-zinc-950 shadow-2xl z-[90] transform translate-x-full flex flex-col border-l border-slate-100 dark:border-white/5"
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-white/5">
