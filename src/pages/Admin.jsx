@@ -144,45 +144,15 @@ const Admin = () => {
         }
     };
 
-    const handleFileUpload = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const handleAddMediaUrl = () => {
+        if (!newMediaUrl.trim()) return;
 
-        if (mediaType === 'video' && file.size > 5 * 1024 * 1024) {
-            alert('Atenção: O vídeo possui mais de 5MB e pode dar erro ao salvar no banco de dados gratuito.');
+        if (mediaType === 'image') {
+            setFormData(prev => ({ ...prev, images: [...prev.images, newMediaUrl.trim()] }));
+        } else {
+            setFormData(prev => ({ ...prev, video: newMediaUrl.trim() }));
         }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result;
-
-            if (mediaType === 'image') {
-                const img = new Image();
-                img.src = base64String;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > MAX_WIDTH) {
-                        height = Math.round((height * MAX_WIDTH) / width);
-                        width = MAX_WIDTH;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const compressedBase64 = canvas.toDataURL('image/webp', 0.7);
-                    setFormData(prev => ({ ...prev, images: [...prev.images, compressedBase64] }));
-                };
-            } else {
-                setFormData(prev => ({ ...prev, video: base64String }));
-            }
-        };
-        reader.readAsDataURL(file);
+        setNewMediaUrl(''); // clear input after adding
     };
 
     const handleRemoveImage = (e, index) => {
@@ -641,21 +611,18 @@ const Admin = () => {
                                     </div>
 
                                     <div className="flex flex-col sm:flex-row gap-3 w-full mb-8">
-                                        <div className="flex-1 p-4 border border-slate-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-black/40 dark:text-white text-sm outline-none transition-colors shadow-inner flex items-center justify-between pointer-events-none">
-                                            <span className="text-slate-400">Clique em Importar para abrir a galeria...</span>
-                                        </div>
-
                                         <input
-                                            type="file"
-                                            id="mediaUpload"
-                                            className="hidden"
-                                            accept={mediaType === 'image' ? "image/*" : "video/*"}
-                                            onChange={handleFileUpload}
+                                            type="text"
+                                            value={newMediaUrl}
+                                            onChange={(e) => setNewMediaUrl(e.target.value)}
+                                            placeholder={`Cole aqui o link/URL da ${mediaType === 'image' ? 'nova Imagem' : 'URL do Vídeo (ex: YouTube)'}...`}
+                                            className="flex-1 p-4 border border-slate-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-black/40 dark:text-white text-sm outline-none transition-colors shadow-inner flex items-center justify-between"
+                                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddMediaUrl(); } }}
                                         />
 
-                                        <label htmlFor="mediaUpload" className="bg-slate-900 cursor-pointer dark:bg-white/10 text-white dark:text-slate-200 px-6 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-slate-800 dark:hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg">
-                                            <span className="material-symbols-outlined text-[18px]">add_circle</span> Importar {mediaType === 'image' ? 'Imagem' : 'Vídeo'}
-                                        </label>
+                                        <button type="button" onClick={handleAddMediaUrl} className="bg-slate-900 cursor-pointer dark:bg-white/10 text-white dark:text-slate-200 px-6 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-slate-800 dark:hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg">
+                                            <span className="material-symbols-outlined text-[18px]">add_link</span> Inserir Link
+                                        </button>
                                     </div>
 
                                     {formData.video && (
