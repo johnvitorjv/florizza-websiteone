@@ -609,11 +609,6 @@ const Admin = () => {
                                         </select>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold mb-2">Ordem Listagem</label>
-                                        <input type="number" value={formData.orderIndex} onChange={e => setFormData({ ...formData, orderIndex: e.target.value })} placeholder="Ex: 5" className="w-full p-4 border border-slate-200 dark:border-zinc-800 rounded-xl bg-slate-50/50 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all shadow-inner" />
-                                    </div>
-
                                     <div className="md:col-span-2">
                                         <label className="block text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold mb-2">Descrição SEO / Detalhes</label>
                                         <textarea rows="3" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full p-4 border border-slate-200 dark:border-zinc-800 rounded-xl bg-slate-50/50 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all resize-none shadow-inner"></textarea>

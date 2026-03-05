@@ -79,8 +79,8 @@ const ProductCard = ({ product, viewMode }) => {
                     </div>
                 )}
 
-                {/* Hover Actions */}
-                <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center pb-12 gap-4">
+                {/* Hover Actions — z-20 so it always floats above images */}
+                <div className="absolute inset-0 bg-black/35 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center pb-10 gap-4 z-20 pointer-events-none group-hover:pointer-events-auto">
                     <button
                         ref={btnRef}
                         onClick={(e) => {
@@ -100,11 +100,11 @@ const ProductCard = ({ product, viewMode }) => {
                                 .to(btnRef.current, { scale: 1.1, backgroundColor: '#82cf17', duration: 0.2, ease: 'back.out(2)' })
                                 .to(btnRef.current, { scale: 1, duration: 0.2, ease: 'power2.out' });
                         }}
-                        className={`flex items-center gap-2 text-white px-6 py-3 rounded-full text-sm font-bold tracking-wide transition-all transform translate-y-8 group-hover:translate-y-0 duration-500 shadow-lg ${isAdding ? 'bg-[#82cf17] shadow-[0_0_20px_rgba(130,207,23,0.6)]' : 'bg-primary hover:bg-[#62b412] hover:scale-105 active:scale-95'}`}
+                        className={`flex items-center gap-2 text-white px-6 py-3 rounded-full text-sm font-bold tracking-wide transition-all transform translate-y-6 group-hover:translate-y-0 duration-500 shadow-lg ${isAdding ? 'bg-[#82cf17] shadow-[0_0_20px_rgba(130,207,23,0.6)]' : 'bg-primary hover:bg-[#62b412] hover:scale-105 active:scale-95'}`}
                     >
                         <ShoppingBag size={18} /> {isAdding ? 'Na Sacola' : 'Adicionar'}
                     </button>
-                    <button title="Espiar" className="flex items-center justify-center size-12 bg-white/95 text-slate-800 rounded-full hover:bg-white hover:text-primary transition-all transform translate-y-8 group-hover:translate-y-0 duration-500 delay-75 shadow-lg hover:shadow-xl hover:scale-110 active:scale-95">
+                    <button title="Espiar" className="flex items-center justify-center size-12 bg-white/95 text-slate-800 rounded-full hover:bg-white hover:text-primary transition-all transform translate-y-6 group-hover:translate-y-0 duration-500 delay-75 shadow-lg hover:shadow-xl hover:scale-110 active:scale-95">
                         <Eye size={20} />
                     </button>
                 </div>

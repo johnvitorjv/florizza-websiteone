@@ -58,7 +58,7 @@ const Intro = ({ onComplete }) => {
             }, 0.5);
 
             tl.to(titleRef.current,
-                { backgroundPosition: "-300% center", duration: 2.8, ease: "power1.inOut" },
+                { backgroundPosition: "-300% center", duration: 5.5, ease: "power1.inOut", repeat: 1 },
                 1.0
             );
 
@@ -70,7 +70,7 @@ const Intro = ({ onComplete }) => {
                 ease: "power2.out"
             }, 1.5);
 
-            tl.to({}, { duration: 2.0 });
+            tl.to({}, { duration: 4.0 });
         }, containerRef);
 
         return () => ctx.revert();

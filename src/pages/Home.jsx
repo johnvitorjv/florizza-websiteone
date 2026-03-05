@@ -5,7 +5,7 @@ import FooterInfo from '../components/FooterInfo';
 import HeroSlider from '../components/HeroSlider';
 import { useProducts } from '../context/ProductContext';
 
-const Home = () => {
+const Home = ({ toggleDark, isDark }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const containerRef = useRef(null);
@@ -33,10 +33,12 @@ const Home = () => {
         if (targetVariant === renderedVariant && !isAnimating) {
             const ctx = gsap.context(() => {
                 const activeRef = targetVariant === 1 ? v1Ref.current : v2Ref.current;
-                gsap.fromTo(activeRef,
-                    { opacity: 0, scale: 0.95 },
-                    { opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" }
-                );
+                if (activeRef) {
+                    gsap.fromTo(activeRef,
+                        { opacity: 0, scale: 0.97 },
+                        { opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" }
+                    );
+                }
             });
             return () => ctx.revert();
         }
@@ -46,7 +48,6 @@ const Home = () => {
             setIsAnimating(true);
             const ctx = gsap.context(() => {
                 const currentRef = renderedVariant === 1 ? v1Ref.current : v2Ref.current;
-
                 const tl = gsap.timeline({
                     onComplete: () => {
                         // Switch active component while screen is black!
@@ -62,22 +63,28 @@ const Home = () => {
                             });
 
                             // Slide texts in from side, fade out the black overlay
-                            t2.fromTo(newRef.querySelector('.animate-in'),
-                                { opacity: 0, x: targetVariant === 2 ? 100 : -100 },
-                                { opacity: 1, x: 0, duration: 1.2, ease: "power4.out" }
-                            );
+                            const animIn = newRef.querySelector('.animate-in');
+                            if (animIn) {
+                                t2.fromTo(animIn,
+                                    { opacity: 0, x: targetVariant === 2 ? 100 : -100 },
+                                    { opacity: 1, x: 0, duration: 1.2, ease: "power4.out" }
+                                );
+                            }
                             t2.to(transitionOverlayRef.current, { autoAlpha: 0, duration: 0.8 }, "-=0.8");
                         });
                     }
                 });
 
                 // Exit animation: Slide texts away, fade to black
-                tl.to(currentRef.querySelector('.animate-in'), {
-                    opacity: 0,
-                    x: targetVariant === 2 ? -100 : 100,
-                    duration: 0.8,
-                    ease: "power3.in"
-                });
+                const animOut = currentRef ? currentRef.querySelector('.animate-in') : null;
+                if (animOut) {
+                    tl.to(animOut, {
+                        opacity: 0,
+                        x: targetVariant === 2 ? -100 : 100,
+                        duration: 0.8,
+                        ease: "power3.in"
+                    });
+                }
                 // Bring in black overlay
                 tl.to(transitionOverlayRef.current, { autoAlpha: 1, duration: 0.6 }, "-=0.4");
 
@@ -100,6 +107,10 @@ const Home = () => {
                 }
             });
         }
+    };
+
+    const handleToggle = () => {
+        navigate(isV2Path ? '/' : '/v2');
     };
 
     // -------------------------------------------------------------------
@@ -125,13 +136,34 @@ const Home = () => {
                                 Descubra o luxo minimalista em cada detalhe. Peças curadas para a mulher que valoriza a sofisticação atemporal.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <button onClick={handleGoToCatalog} className="inline-flex items-center justify-center px-10 py-5 bg-primary text-white text-[10px] font-semibold tracking-[0.3em] uppercase hover:bg-slate-900 dark:hover:bg-white dark:hover:text-black transition-colors duration-500 rounded-full">
-                                    Ver catálogo
+                                {/* V2-style button for Explore Catalog */}
+                                <button
+                                    onClick={handleGoToCatalog}
+                                    className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-black dark:bg-white px-10 py-5 text-[10px] font-semibold tracking-[0.3em] uppercase text-white dark:text-black transition-all hover:scale-[1.03] active:scale-95"
+                                >
+                                    <span className="relative z-10 transition-colors group-hover:text-white">Explorar Catálogo</span>
+                                    <div className="absolute inset-0 z-0 h-full w-0 bg-primary transition-all duration-500 ease-out group-hover:w-full"></div>
                                 </button>
-                                <a href="https://wa.me/5571982570273" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-10 py-5 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-[10px] font-semibold tracking-[0.3em] uppercase hover:border-primary hover:text-primary transition-all duration-500 rounded-full">
-                                    Whatsapp
+                                {/* V2-style WhatsApp link */}
+                                <a
+                                    href="https://wa.me/5571982570273"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group flex items-center justify-center sm:justify-start text-[10px] font-medium tracking-[0.3em] uppercase text-slate-500 dark:text-slate-400 transition-colors hover:text-primary"
+                                >
+                                    Falar no WhatsApp
+                                    <span className="ml-4 h-[1px] w-12 bg-slate-300 dark:bg-slate-700 transition-all duration-500 group-hover:w-20 group-hover:bg-primary"></span>
                                 </a>
                             </div>
+
+                            {/* Toggle button V1→V2 */}
+                            <button
+                                onClick={handleToggle}
+                                className="mt-8 text-[9px] uppercase tracking-[0.3em] text-slate-400 hover:text-primary transition-colors flex items-center gap-2 group"
+                            >
+                                <span className="material-symbols-outlined text-sm transition-transform group-hover:rotate-180 duration-500">space_dashboard</span>
+                                Ver versão V2
+                            </button>
                         </div>
                     </div>
                     <div className="w-full lg:w-3/5 mt-12 lg:mt-0 flex justify-end items-center">
@@ -153,6 +185,7 @@ const Home = () => {
 
     // -------------------------------------------------------------------
     // V2 SCREEN (Redesigned: Genuinely High-End & Impeccable)
+    // Now includes theme toggle + footer + working V2→V1 toggle
     // -------------------------------------------------------------------
     const ScreenTwo = () => (
         <div className="absolute inset-0 w-full min-h-screen" ref={v2Ref} style={{ zIndex: 1 }}>
@@ -167,7 +200,7 @@ const Home = () => {
                             <span className="inline-block text-[10px] uppercase tracking-[0.5em] font-medium text-primary mb-8 opacity-80">
                                 The Genesis Collection
                             </span>
-                            <h1 className="hero-serif text-5xl md:text-7xl lg:text-[5.5rem] leading-[1.05] mb-8 text-white font-normal mix-blend-difference">
+                            <h1 className="hero-serif text-5xl md:text-7xl lg:text-[5.5rem] leading-[1.05] mb-8 text-white font-normal">
                                 Redefining <br />
                                 <span className="italic text-slate-400 font-light">Elegance.</span>
                             </h1>
@@ -194,6 +227,15 @@ const Home = () => {
                                     <span className="ml-4 h-[1px] w-12 bg-slate-700 transition-all duration-500 group-hover:w-20 group-hover:bg-primary"></span>
                                 </a>
                             </div>
+
+                            {/* Toggle back to V1 */}
+                            <button
+                                onClick={handleToggle}
+                                className="mt-10 text-[9px] uppercase tracking-[0.3em] text-slate-600 hover:text-slate-300 transition-colors flex items-center gap-2 group"
+                            >
+                                <span className="material-symbols-outlined text-sm transition-transform group-hover:-rotate-180 duration-500">view_agenda</span>
+                                Ver versão clássica
+                            </button>
                         </div>
 
                         {/* Impeccable Detail markers */}
@@ -208,7 +250,7 @@ const Home = () => {
                 <div className="absolute lg:relative inset-y-0 right-0 w-full lg:w-1/2 h-screen z-0">
                     <div className="w-full h-full overflow-hidden">
                         <HeroSlider variant={2} />
-                        {/* Overlay to ensure text legibility on mobile, but clean on desktop */}
+                        {/* Overlay for text legibility on mobile */}
                         <div className="absolute inset-0 bg-black/40 lg:bg-black/10 pointer-events-none z-10"></div>
                         {/* Soft blend edge on desktop */}
                         <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
@@ -216,11 +258,43 @@ const Home = () => {
                 </div>
 
             </main>
+
+            {/* Footer for V2 */}
+            <div className="bg-black">
+                <FooterInfo variant={2} />
+            </div>
+        </div>
+    );
+
+    // Mobile bottom nav for Home (small screens)
+    const MobileNav = () => (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex md:hidden items-center gap-1 px-2 py-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl rounded-full shadow-2xl border border-slate-200 dark:border-white/10 z-[85]">
+            {[
+                { label: 'Início', path: '/', icon: 'home' },
+                { label: 'Catálogo', path: '/catalogo', icon: 'grid_view' },
+                { label: 'Sobre', path: '/sobre', icon: 'person' },
+            ].map(item => {
+                const isActive = location.pathname === item.path || (item.path === '/' && location.pathname === '/v2');
+                return (
+                    <a
+                        key={item.path}
+                        href={item.path}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate(item.path);
+                        }}
+                        className={`flex flex-col items-center gap-0.5 px-5 py-2 rounded-full text-[8px] uppercase tracking-[0.15em] font-bold transition-all duration-300 ${isActive ? 'bg-primary text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-primary'}`}
+                    >
+                        <span className="material-symbols-outlined text-base">{item.icon}</span>
+                        {item.label}
+                    </a>
+                );
+            })}
         </div>
     );
 
     return (
-        <div className="relative w-full h-full page-wrapper">
+        <div className="relative w-full h-full page-wrapper" ref={containerRef}>
             {/* Transition Overlay (Pitch Black Cinematic Fade) */}
             <div
                 ref={transitionOverlayRef}
@@ -230,6 +304,9 @@ const Home = () => {
             {/* Actually render the chosen variant to the DOM */}
             {renderedVariant === 1 && <ScreenOne />}
             {renderedVariant === 2 && <ScreenTwo />}
+
+            {/* Mobile Navigation */}
+            <MobileNav />
         </div>
     );
 };

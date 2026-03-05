@@ -9,7 +9,13 @@ const Checkout = () => {
     const navigate = useNavigate();
     const pageRef = useRef(null);
     const btnRef = useRef(null);
+    const waOverlayRef = useRef(null);
+    const waIconRef = useRef(null);
+    const waRingRef = useRef(null);
+    const waCheckRef = useRef(null);
+    const waTextRef = useRef(null);
     const [isCompleting, setIsCompleting] = useState(false);
+    const [showWAAnimation, setShowWAAnimation] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -144,12 +150,52 @@ const Checkout = () => {
             });
         }
 
-        gsap.timeline({
-            onComplete: () => handleSubmit() // run the actual logic after animation
-        })
-            .to(btnRef.current, { scale: 0.95, backgroundColor: '#62b412', duration: 0.15, ease: 'power2.inOut' })
-            .to(btnRef.current, { scale: 1.04, duration: 0.6, ease: 'elastic.out(1.2, 0.4)' })
-            .to(btnRef.current, { scale: 1, duration: 0.2 });
+        // ── Spectacular WhatsApp Animation ──────────────────────────────
+        setShowWAAnimation(true);
+
+        // Give React a frame to render the overlay before animating
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const overlay = waOverlayRef.current;
+                const icon = waIconRef.current;
+                const ring = waRingRef.current;
+                const check = waCheckRef.current;
+                const text = waTextRef.current;
+                if (!overlay) return;
+
+                gsap.set(overlay, { autoAlpha: 0 });
+                gsap.set(icon, { scale: 0, opacity: 0, y: 40 });
+                gsap.set(ring, { scale: 0.5, opacity: 0 });
+                gsap.set(check, { scale: 0, opacity: 0, rotation: -45 });
+                gsap.set(text, { opacity: 0, y: 20 });
+
+                const tl = gsap.timeline({
+                    onComplete: () => {
+                        handleSubmit();
+                    }
+                });
+
+                // 1. Fade in black overlay with page blur
+                tl.to(overlay, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' })
+                    // 2. Pulse ring burst
+                    .to(ring, { scale: 1.6, opacity: 0.3, duration: 0.6, ease: 'power3.out' }, '-=0.1')
+                    .to(ring, { scale: 2.2, opacity: 0, duration: 0.5, ease: 'power2.in' }, '-=0.1')
+                    // 3. WhatsApp icon elastic entrance
+                    .to(icon, { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: 'elastic.out(1.2, 0.5)' }, '-=0.4')
+                    // 4. Second ring burst (ripple effect)
+                    .set(ring, { scale: 0.8, opacity: 0.4 })
+                    .to(ring, { scale: 3, opacity: 0, duration: 0.9, ease: 'power2.out' }, '-=0.2')
+                    // 5. Checkmark pops in
+                    .to(check, { scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(3)' }, '-=0.5')
+                    // 6. Motivational text appears
+                    .to(text, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+                    // 7. Hold for a beat
+                    .to({}, { duration: 0.9 })
+                    // 8. Flash out with radial white burst
+                    .to(overlay, { backgroundColor: '#25D366', duration: 0.3, ease: 'power2.in' })
+                    .to(overlay, { autoAlpha: 0, scale: 1.1, duration: 0.4, ease: 'power3.out' });
+            });
+        });
     };
 
     // WhatsApp Order Generation
@@ -198,6 +244,48 @@ const Checkout = () => {
 
     return (
         <div ref={pageRef} className="page-wrapper min-h-screen bg-plaster dark:bg-zinc-950 pt-24 pb-20 font-sans transition-colors">
+
+            {/* ── Spectacular WhatsApp Animation Overlay ── */}
+            {showWAAnimation && (
+                <div
+                    ref={waOverlayRef}
+                    className="fixed inset-0 z-[200] bg-black flex items-center justify-center flex-col gap-8"
+                    style={{ visibility: 'hidden', opacity: 0 }}
+                >
+                    {/* Pulsing ring */}
+                    <div
+                        ref={waRingRef}
+                        className="absolute w-48 h-48 rounded-full border-4 border-[#25D366]/60"
+                        style={{ opacity: 0 }}
+                    />
+                    {/* WhatsApp icon */}
+                    <div
+                        ref={waIconRef}
+                        className="relative w-36 h-36 rounded-full bg-[#25D366] flex items-center justify-center shadow-[0_0_60px_rgba(37,211,102,0.5)]"
+                        style={{ opacity: 0 }}
+                    >
+                        <svg viewBox="0 0 32 32" fill="white" className="w-20 h-20">
+                            <path d="M16 0C7.163 0 0 7.163 0 16c0 2.82.733 5.467 2.015 7.77L0 32l8.445-2.015A15.933 15.933 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.091a13.07 13.07 0 01-6.664-1.82l-.48-.284-4.977 1.187 1.21-4.844-.315-.5A13.052 13.052 0 012.91 16C2.91 9.295 8.295 3.91 16 3.91S29.091 9.295 29.091 16 23.705 29.091 16 29.091zm7.156-9.782c-.392-.196-2.32-1.144-2.68-1.275-.36-.13-.622-.196-.883.196-.261.392-1.013 1.275-1.242 1.536-.229.261-.457.294-.85.098-.392-.196-1.656-.61-3.155-1.945-1.166-1.04-1.953-2.323-2.183-2.716-.229-.392-.024-.604.173-.8.177-.177.392-.457.588-.687.196-.229.261-.392.392-.654.13-.261.065-.49-.033-.687-.098-.196-.883-2.127-1.21-2.913-.319-.763-.644-.659-.883-.671l-.752-.013c-.261 0-.686.098-.955.49C10.5 11.45 9.75 12.397 9.75 14.31c0 1.91 1.39 3.758 1.583 4.019.196.261 2.73 4.167 6.614 5.843.924.398 1.645.637 2.207.816.927.295 1.77.254 2.437.154.743-.11 2.32-.948 2.647-1.864.327-.916.327-1.701.229-1.864-.097-.163-.36-.261-.751-.457z" />
+                        </svg>
+                        {/* Checkmark badge */}
+                        <div
+                            ref={waCheckRef}
+                            className="absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg"
+                            style={{ opacity: 0 }}
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#25D366" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                    </div>
+                    {/* Motivational text */}
+                    <div ref={waTextRef} className="text-center" style={{ opacity: 0 }}>
+                        <p className="text-white text-xl font-display font-light tracking-widest">Pedido Pronto! 🎉</p>
+                        <p className="text-slate-400 text-sm mt-2 tracking-wide">Redirecionando para o WhatsApp...</p>
+                    </div>
+                </div>
+            )}
+
             <div className="container mx-auto px-6 md:px-12 xl:px-32 max-w-7xl">
 
                 {/* Header */}
