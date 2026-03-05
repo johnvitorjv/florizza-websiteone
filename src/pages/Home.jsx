@@ -122,13 +122,13 @@ const Home = () => {
                         </div>
                     </div>
                     <div className="w-full lg:w-3/5 mt-12 lg:mt-0 flex justify-end items-center">
-                        <div className="relative w-full aspect-[4/5] lg:aspect-[3/4] max-w-2xl bg-[#EBE9E6] dark:bg-zinc-800 p-4 md:p-8 lg:p-10 rounded-[3rem] lg:rounded-l-[15rem] lg:rounded-br-[15rem] niche-shadow overflow-hidden">
+                        <div className="relative w-full aspect-[4/5] lg:aspect-[3/4] max-w-2xl bg-[#EBE9E6] dark:bg-zinc-800 p-4 md:p-8 lg:p-10 rounded-[3rem] lg:rounded-l-[15rem] lg:rounded-br-[15rem] niche-shadow">
                             <div className="w-full h-full overflow-hidden rounded-[2rem] lg:rounded-tl-[13rem] lg:rounded-br-[13rem] relative bg-plaster dark:bg-zinc-950 border border-white/40 dark:border-white/5">
                                 <HeroSlider variant={1} />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-40 pointer-events-none z-20" />
                             </div>
-                            <div className="absolute -bottom-6 -right-6 md:-right-12 bg-primary text-white py-6 px-10 hidden md:block rounded-full shadow-lg">
-                                <p className="text-[9px] uppercase tracking-[0.5em] whitespace-nowrap">Quiet Luxury Aesthetic</p>
+                            <div className="absolute -bottom-6 -right-6 md:-right-12 bg-primary text-white py-6 px-10 hidden md:block rounded-full shadow-lg z-30">
+                                <p className="text-[9px] uppercase tracking-[0.5em] whitespace-nowrap">Estética de Luxo Silencioso</p>
                             </div>
                         </div>
                     </div>
@@ -142,28 +142,23 @@ const Home = () => {
     // V2 SCREEN — NOW IN PORTUGUESE + LIGHT MODE + MOBILE FIXED
     // ────────────────────────────────────────────
     const ScreenTwo = () => {
-        const isDark = document.documentElement.classList.contains('dark');
-        const bgColor = isDark ? 'bg-black' : 'bg-[#f8f9fa]';
-        const textColor = isDark ? 'text-white' : 'text-slate-900';
-        const subTextColor = isDark ? 'text-slate-400' : 'text-slate-500';
-        const overlayMobile = isDark ? 'bg-black/50' : 'bg-white/60';
-        const overlayDesktop = isDark ? 'bg-black/10' : 'bg-white/10';
-        const gradientFrom = isDark ? 'from-black' : 'from-[#f8f9fa]';
-        const detailColor = isDark ? 'text-slate-600' : 'text-slate-400';
-        const detailLine = isDark ? 'bg-slate-800' : 'bg-slate-300';
-        const btnBg = isDark ? 'bg-white' : 'bg-black';
-        const btnText = isDark ? 'text-black' : 'text-white';
-        const waColor = isDark ? 'text-slate-300' : 'text-slate-500';
-        const waLine = isDark ? 'bg-slate-700' : 'bg-slate-300';
-        const toggleColor = isDark ? 'text-slate-600 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700';
+        // V2 always has dark overlay over image, so text is always white
+        const textColor = 'text-white';
+        const subTextColor = 'text-slate-300';
+        const overlayMobile = 'bg-black/40';
+        const btnBg = 'bg-white';
+        const btnText = 'text-black';
+        const waColor = 'text-slate-300';
+        const waLine = 'bg-slate-600';
+        const toggleColor = 'text-slate-400 hover:text-white';
 
         return (
             <div className="absolute inset-0 w-full min-h-screen" ref={v2Ref} style={{ zIndex: 1 }}>
-                <main className={`relative min-h-screen flex ${bgColor} overflow-hidden page-wrapper`}>
+                <main className="relative min-h-screen flex bg-black overflow-hidden page-wrapper">
 
                     {/* Left Side */}
                     <div className="w-full lg:w-1/2 min-h-screen flex items-center relative z-20">
-                        <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} via-transparent lg:to-transparent z-0`} style={{ background: isDark ? undefined : `linear-gradient(to right, #f8f9fa 0%, #f8f9fa 40%, transparent 100%)` }} />
+                        <div className="absolute inset-0 z-0" style={{ background: 'linear-gradient(to right, #000 0%, rgba(0,0,0,0.6) 40%, transparent 100%)' }} />
 
                         <div className="animate-in container mx-auto px-6 md:px-12 lg:px-24 flex flex-col justify-center relative z-10 w-full h-full pt-24 pb-16 lg:pt-0 lg:pb-0">
                             <div className="max-w-xl">
@@ -195,8 +190,8 @@ const Home = () => {
                                 </button>
                             </div>
 
-                            <div className={`absolute bottom-8 left-6 md:left-12 lg:left-24 hidden lg:flex items-center space-x-6 text-[9px] uppercase tracking-widest ${detailColor}`}>
-                                <span className={`w-12 h-[1px] ${detailLine}`} />
+                            <div className="absolute bottom-8 left-6 md:left-12 lg:left-24 hidden lg:flex items-center space-x-6 text-[9px] uppercase tracking-widest text-slate-500">
+                                <span className="w-12 h-[1px] bg-slate-700" />
                                 <span>SS/26 Exclusives</span>
                             </div>
                         </div>
@@ -206,13 +201,13 @@ const Home = () => {
                     <div className="absolute lg:relative inset-y-0 right-0 w-full lg:w-1/2 h-screen z-0">
                         <div className="w-full h-full overflow-hidden">
                             <HeroSlider variant={2} />
-                            <div className={`absolute inset-0 ${overlayMobile} lg:${overlayDesktop} pointer-events-none z-10`} />
-                            <div className={`hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r ${gradientFrom} to-transparent z-10 pointer-events-none`} />
+                            <div className={`absolute inset-0 ${overlayMobile} lg:bg-black/10 pointer-events-none z-10`} />
+                            <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
                         </div>
                     </div>
                 </main>
 
-                <div className={bgColor}>
+                <div className="bg-black">
                     <FooterInfo variant={2} />
                 </div>
             </div>

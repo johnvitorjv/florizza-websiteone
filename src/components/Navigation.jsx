@@ -83,18 +83,18 @@ const Navigation = ({ toggleDark, isDark }) => {
             <a
                 href="/"
                 onClick={(e) => { e.preventDefault(); handleNavigate('/'); }}
-                className="text-lg md:text-2xl font-display font-medium tracking-[0.25em] uppercase cursor-pointer hover:text-primary transition-colors duration-300 mix-blend-difference text-white"
+                className="text-lg md:text-2xl font-display font-medium tracking-[0.25em] uppercase cursor-pointer hover:text-primary transition-colors duration-300 text-slate-900 dark:text-white"
             >
                 Florizza
             </a>
 
             {/* ── Arrow Navigation Pill ── */}
-            <div className="flex items-center gap-0 bg-white/10 dark:bg-white/5 backdrop-blur-xl rounded-full border border-white/10 shadow-lg mix-blend-normal">
+            <div className="flex items-center gap-0 bg-black/15 dark:bg-white/10 backdrop-blur-xl rounded-full border border-black/10 dark:border-white/10 shadow-lg">
                 {/* Left Arrow */}
                 <button
                     onClick={goLeft}
                     disabled={!canGoLeft}
-                    className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full transition-all duration-300 ${canGoLeft ? 'text-white hover:bg-white/20 hover:text-primary cursor-pointer active:scale-90' : 'text-white/20 cursor-default'}`}
+                    className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full transition-all duration-300 ${canGoLeft ? 'text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 hover:text-primary cursor-pointer active:scale-90' : 'text-slate-300 dark:text-white/20 cursor-default'}`}
                 >
                     <span className="material-symbols-outlined text-lg md:text-xl">chevron_left</span>
                 </button>
@@ -102,7 +102,7 @@ const Navigation = ({ toggleDark, isDark }) => {
                 {/* Current Page Name */}
                 <div
                     ref={pillRef}
-                    className="px-3 md:px-6 py-1.5 md:py-2 text-[9px] md:text-[11px] font-bold tracking-[0.3em] uppercase text-white select-none min-w-[80px] md:min-w-[100px] text-center"
+                    className="px-3 md:px-6 py-1.5 md:py-2 text-[9px] md:text-[11px] font-bold tracking-[0.3em] uppercase text-slate-800 dark:text-white select-none min-w-[80px] md:min-w-[100px] text-center"
                 >
                     {pages[activeIndex].name}
                 </div>
@@ -111,14 +111,14 @@ const Navigation = ({ toggleDark, isDark }) => {
                 <button
                     onClick={goRight}
                     disabled={!canGoRight}
-                    className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full transition-all duration-300 ${canGoRight ? 'text-white hover:bg-white/20 hover:text-primary cursor-pointer active:scale-90' : 'text-white/20 cursor-default'}`}
+                    className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full transition-all duration-300 ${canGoRight ? 'text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 hover:text-primary cursor-pointer active:scale-90' : 'text-slate-300 dark:text-white/20 cursor-default'}`}
                 >
                     <span className="material-symbols-outlined text-lg md:text-xl">chevron_right</span>
                 </button>
             </div>
 
             {/* ── Right Tools ── */}
-            <div className="flex items-center gap-2 md:gap-4 mix-blend-difference text-white">
+            <div className="flex items-center gap-2 md:gap-4 text-slate-900 dark:text-white">
                 {/* V1/V2 toggle — only on home pages */}
                 {(location.pathname === '/' || isV2) && (
                     <button onClick={handleToggleLayout} className="hidden md:flex items-center justify-center hover:text-primary transition-colors" title={isV2 ? 'Voltar para V1' : 'Ver V2'}>
