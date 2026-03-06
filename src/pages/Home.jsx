@@ -90,6 +90,7 @@ const Home = () => {
         <div className="absolute inset-0 w-full min-h-screen" ref={v1Ref} style={{ zIndex: 1 }}>
             <main className="relative min-h-screen flex items-center overflow-hidden pt-20 bg-[#f8f9fa] dark:bg-background-dark">
                 <div className="absolute inset-0 z-0 plaster-texture pointer-events-none" />
+                <div className="absolute inset-0 z-0 bg-luxury-pattern-light pointer-events-none" />
                 <div className="absolute right-0 top-0 w-1/3 h-full bg-plaster/30 dark:bg-white/5 border-l border-white/20 z-0" />
 
                 <div className="animate-in container mx-auto px-6 md:px-12 lg:px-24 flex flex-col lg:flex-row items-center gap-0 z-10 w-full">

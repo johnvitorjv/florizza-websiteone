@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { useNavigate } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
+import { Search, X, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 
 const SearchModal = ({ isOpen, onClose }) => {
@@ -10,60 +10,46 @@ const SearchModal = ({ isOpen, onClose }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const inputRef = useRef(null);
     const overlayRef = useRef(null);
-    const modalRef = useRef(null);
+    const contentRef = useRef(null);
     const lineRef = useRef(null);
     const suggestionRefs = useRef([]);
 
-    // Busca apenas o que realmente existe nas categorias
-    // Caso não tenha produto na categoria, ela ainda existe no admin se o usuário a criou,
-    // o que satisfaz o requisito ("o que realmente tem em catalogo... atualiza junto").
     const topSearches = categories.slice(0, 5);
 
     useEffect(() => {
         if (isOpen) {
-            // Animate overlay in
             gsap.to(overlayRef.current, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' });
-
-            // Animate modal container up slightly
-            gsap.fromTo(modalRef.current,
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+            gsap.fromTo(contentRef.current,
+                { y: 40, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: 0.15 }
             );
-
-            // Animate the thin line growing from center
             gsap.fromTo(lineRef.current,
                 { scaleX: 0 },
-                { scaleX: 1, duration: 0.8, ease: 'power3.inOut', delay: 0.3 }
+                { scaleX: 1, duration: 1, ease: 'power3.inOut', delay: 0.3 }
             );
-
-            // Animate suggestions fading in with stagger
             if (suggestionRefs.current.length > 0) {
-                gsap.fromTo(suggestionRefs.current,
-                    { y: 10, opacity: 0 },
-                    { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.5 }
+                gsap.fromTo(suggestionRefs.current.filter(Boolean),
+                    { y: 12, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: 'power2.out', delay: 0.5 }
                 );
             }
-
             document.body.style.overflow = 'hidden';
-            setTimeout(() => inputRef.current?.focus(), 600); // Focus after animations
+            setTimeout(() => inputRef.current?.focus(), 500);
         } else {
-            // Smooth exit
             gsap.to(overlayRef.current, { autoAlpha: 0, duration: 0.4, ease: 'power2.in' });
-            gsap.to(modalRef.current, { y: -20, opacity: 0, duration: 0.3, ease: 'power2.in' });
+            gsap.to(contentRef.current, { y: -20, opacity: 0, duration: 0.3, ease: 'power2.in' });
             document.body.style.overflow = '';
-            setTimeout(() => setSearchTerm(''), 400); // clear after close
+            setTimeout(() => setSearchTerm(''), 400);
         }
-
         return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
 
-    // Handle search logic
     const filteredProducts = searchTerm.length > 1
         ? products.filter(p =>
             p.active &&
             (p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 p.category.toLowerCase().includes(searchTerm.toLowerCase()))
-        ).slice(0, 4) // Show up to 4 beautiful cards
+        ).slice(0, 4)
         : [];
 
     const handleProductClick = (id) => {
@@ -79,32 +65,41 @@ const SearchModal = ({ isOpen, onClose }) => {
     return (
         <div
             ref={overlayRef}
-            className="fixed inset-0 bg-[#F9F8F6]/95 dark:bg-[#0A0A0A]/95 backdrop-blur-xl z-[90] invisible opacity-0"
+            className="fixed inset-0 z-[90] invisible opacity-0"
+            onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
         >
-            <div className="container mx-auto px-6 md:px-12 h-full flex flex-col pt-[15vh] max-w-4xl relative">
+            {/* Backdrop with subtle blur */}
+            <div className="absolute inset-0 bg-[#F9F8F6]/97 dark:bg-[#0A0A0A]/97 backdrop-blur-2xl" />
 
-                {/* Close Button - Minimalist */}
+            {/* Content Container — perfectly centered */}
+            <div className="relative z-10 h-full flex flex-col items-center justify-start pt-[12vh] md:pt-[15vh] px-6 overflow-y-auto">
+
+                {/* Close Button — top right, minimal */}
                 <button
                     onClick={onClose}
-                    className="absolute top-8 right-6 md:right-12 p-3 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors group"
+                    className="fixed top-6 right-6 md:top-8 md:right-8 z-50 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-300 hover:bg-slate-100 dark:hover:bg-white/5 group"
                 >
-                    <X size={24} strokeWidth={1} className="group-hover:rotate-90 transition-transform duration-500" />
-                    <span className="sr-only">Fechar busca</span>
+                    <X size={20} strokeWidth={1.5} className="group-hover:rotate-90 transition-transform duration-500" />
                 </button>
 
-                {/* Main Search Area */}
-                <div ref={modalRef} className="w-full relative flex flex-col items-center">
+                {/* Search Content */}
+                <div ref={contentRef} className="w-full max-w-xl flex flex-col items-center">
 
-                    {/* The Input */}
-                    <div className="relative w-full max-w-2xl flex items-center justify-center group">
-                        <Search className="absolute left-0 w-5 h-5 text-slate-300 dark:text-zinc-600 group-focus-within:text-primary transition-colors" strokeWidth={1.5} />
+                    {/* Minimal label */}
+                    <span className="text-[9px] uppercase tracking-[0.5em] text-slate-400 dark:text-slate-500 font-semibold mb-8">
+                        Pesquisar
+                    </span>
+
+                    {/* Input Area */}
+                    <div className="relative w-full flex items-center group">
+                        <Search className="absolute left-0 w-5 h-5 text-slate-300 dark:text-zinc-600 group-focus-within:text-slate-800 dark:group-focus-within:text-white transition-colors duration-300" strokeWidth={1.5} />
 
                         <input
                             ref={inputRef}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Buscar no catálogo..."
-                            className="w-full bg-transparent text-center text-lg md:text-2xl font-light tracking-wide text-slate-800 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-zinc-700 focus:outline-none py-4 px-10"
+                            placeholder="O que você procura?"
+                            className="w-full bg-transparent text-center text-xl md:text-2xl font-light tracking-wide text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-zinc-600 focus:outline-none py-4 px-10 font-display"
                         />
 
                         {searchTerm && (
@@ -114,17 +109,17 @@ const SearchModal = ({ isOpen, onClose }) => {
                         )}
                     </div>
 
-                    {/* The Animated Line */}
-                    <div className="w-full max-w-2xl h-[1px] bg-slate-200 dark:bg-zinc-800 relative mt-2">
-                        <div ref={lineRef} className="absolute inset-0 bg-primary origin-center scale-x-0"></div>
+                    {/* Elegant underline */}
+                    <div className="w-full h-px bg-slate-200/60 dark:bg-zinc-800/80 relative">
+                        <div ref={lineRef} className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-400 dark:via-slate-500 to-transparent origin-center scale-x-0"></div>
                     </div>
 
-                    {/* Content Area */}
-                    <div className="mt-16 w-full max-w-3xl h-[60vh] overflow-y-auto no-scrollbar pb-20">
+                    {/* Content Below */}
+                    <div className="mt-12 md:mt-16 w-full max-w-2xl pb-20">
                         {searchTerm.length < 2 ? (
-                            // Suggestions - minimal tags
-                            <div className="flex flex-col items-center animate-fade-in text-center">
-                                <h3 className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-semibold mb-8">
+                            /* Suggestions */
+                            <div className="flex flex-col items-center text-center">
+                                <h3 className="text-[9px] uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500 font-semibold mb-8">
                                     Termos Frequentes
                                 </h3>
                                 <div className="flex flex-wrap justify-center gap-3">
@@ -133,7 +128,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                                             key={i}
                                             ref={el => suggestionRefs.current[i] = el}
                                             onClick={() => handleSuggestionClick(term)}
-                                            className="px-6 py-2 rounded-full border border-slate-200 dark:border-zinc-800 text-xs font-medium tracking-wider uppercase text-slate-500 hover:border-primary hover:text-primary hover:shadow-[0_0_15px_rgba(115,207,23,0.15)] transition-all bg-white/50 dark:bg-black/20 backdrop-blur-sm"
+                                            className="px-6 py-2.5 rounded-full border border-slate-200 dark:border-zinc-800 text-[11px] font-medium tracking-[0.15em] uppercase text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-800 dark:hover:text-white transition-all duration-300 bg-transparent hover:bg-slate-50 dark:hover:bg-white/5"
                                         >
                                             {term}
                                         </button>
@@ -141,45 +136,50 @@ const SearchModal = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                         ) : (
-                            // Results Search
+                            /* Results */
                             <div className="animate-fade-in">
-                                <h3 className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-semibold mb-8 text-center">
-                                    Encontrado para "{searchTerm}"
+                                <h3 className="text-[9px] uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500 font-semibold mb-8 text-center">
+                                    {filteredProducts.length > 0
+                                        ? `${filteredProducts.length} resultado${filteredProducts.length > 1 ? 's' : ''}`
+                                        : 'Nenhum resultado'}
                                 </h3>
 
                                 {filteredProducts.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <div className="flex flex-col gap-1">
                                         {filteredProducts.map((product, i) => (
-                                            <div
+                                            <button
                                                 key={product.id}
                                                 onClick={() => handleProductClick(product.id)}
-                                                className="group cursor-pointer flex flex-col gap-3 fade-in-up"
-                                                style={{ animationDelay: `${i * 0.1}s` }}
+                                                className="w-full flex items-center gap-5 p-4 rounded-2xl hover:bg-slate-100/80 dark:hover:bg-white/5 transition-all duration-300 group text-left"
+                                                style={{ animationDelay: `${i * 0.08}s` }}
                                             >
-                                                <div className="w-full aspect-[3/4] bg-[#F2F0ED] dark:bg-zinc-900 rounded-sm overflow-hidden relative">
+                                                <div className="w-16 h-20 rounded-lg overflow-hidden bg-slate-100 dark:bg-zinc-800 flex-shrink-0">
                                                     <img
                                                         src={product.images[0]}
                                                         alt={product.name}
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                                     />
-                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500 z-10"></div>
                                                 </div>
-                                                <div className="text-center">
-                                                    <h4 className="text-sm font-display text-slate-900 dark:text-white group-hover:text-primary transition-colors leading-tight mb-1">{product.name}</h4>
-                                                    <p className="text-xs font-medium text-slate-500">
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 font-semibold mb-1">{product.category}</p>
+                                                    <h4 className="font-display text-base text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors leading-tight truncate">{product.name}</h4>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
                                                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
                                                     </p>
                                                 </div>
-                                            </div>
+                                                <ArrowRight size={16} className="text-slate-300 dark:text-zinc-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                                            </button>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
-                                        <Search className="w-8 h-8 text-slate-200 dark:text-zinc-800 mb-6" strokeWidth={1} />
-                                        <p className="text-lg font-display text-slate-800 dark:text-slate-200 mb-2">
+                                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                                        <div className="w-12 h-12 rounded-full border border-slate-200 dark:border-zinc-800 flex items-center justify-center mb-6">
+                                            <Search size={18} className="text-slate-300 dark:text-zinc-600" strokeWidth={1.5} />
+                                        </div>
+                                        <p className="font-display text-lg text-slate-800 dark:text-slate-200 mb-2">
                                             Nenhuma peça encontrada.
                                         </p>
-                                        <p className="text-xs text-slate-400 max-w-xs">
+                                        <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs leading-relaxed">
                                             Tente usar palavras mais curtas ou navegue pelo nosso catálogo completo.
                                         </p>
                                     </div>

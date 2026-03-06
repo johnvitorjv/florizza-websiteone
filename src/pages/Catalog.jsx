@@ -69,7 +69,7 @@ const ProductCard = ({ product, viewMode }) => {
                 )}
 
                 {product.stock === 1 && (
-                    <div className="absolute top-4 left-4 inline-block bg-primary text-white text-[9px] uppercase tracking-wider font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <div className="absolute top-4 left-4 inline-block bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[9px] uppercase tracking-wider font-bold px-3 py-1 rounded-full z-10 shadow-md">
                         Última peça
                     </div>
                 )}
@@ -100,7 +100,7 @@ const ProductCard = ({ product, viewMode }) => {
                                 .to(btnRef.current, { scale: 1.1, backgroundColor: '#82cf17', duration: 0.2, ease: 'back.out(2)' })
                                 .to(btnRef.current, { scale: 1, duration: 0.2, ease: 'power2.out' });
                         }}
-                        className={`flex items-center gap-2 text-white px-6 py-3 rounded-full text-sm font-bold tracking-wide transition-all transform translate-y-6 group-hover:translate-y-0 duration-500 shadow-lg ${isAdding ? 'bg-[#82cf17] shadow-[0_0_20px_rgba(130,207,23,0.6)]' : 'bg-primary hover:bg-[#62b412] hover:scale-105 active:scale-95'}`}
+                        className={`flex items-center gap-2 text-white px-6 py-3 rounded-full text-sm font-bold tracking-wide transition-all transform translate-y-6 group-hover:translate-y-0 duration-500 shadow-lg ${isAdding ? 'bg-slate-700 shadow-lg' : 'bg-slate-900 hover:bg-slate-800 hover:scale-105 active:scale-95'}`}
                     >
                         <ShoppingBag size={18} /> {isAdding ? 'Na Sacola' : 'Adicionar'}
                     </button>
@@ -112,7 +112,7 @@ const ProductCard = ({ product, viewMode }) => {
 
             <div className="flex flex-col flex-1">
                 <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-2">{product.category}</span>
-                <h3 className="hero-serif text-xl text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">{product.name}</h3>
+                <h3 className="hero-serif text-xl text-slate-900 dark:text-white mb-2 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">{product.name}</h3>
                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
                 </p>
@@ -136,7 +136,7 @@ const ProductCard = ({ product, viewMode }) => {
                                     .to(listBtnRef.current, { scale: 1.05, backgroundColor: '#82cf17', duration: 0.2, ease: 'back.out(2)' })
                                     .to(listBtnRef.current, { scale: 1, duration: 0.2, ease: 'power2.out' });
                             }}
-                            className={`px-8 py-3 text-white text-xs tracking-widest uppercase rounded-full transition-all transform hover:-translate-y-1 font-bold flex items-center gap-2 shadow-md ${isAdding ? 'bg-[#82cf17] shadow-[0_0_20px_rgba(130,207,23,0.6)]' : 'bg-primary hover:bg-[#62b412] hover:shadow-[0_8px_20px_rgb(115,207,23,0.3)] active:scale-95'}`}
+                            className={`px-8 py-3 text-white text-xs tracking-widest uppercase rounded-full transition-all transform hover:-translate-y-1 font-bold flex items-center gap-2 shadow-md ${isAdding ? 'bg-slate-700' : 'bg-slate-900 hover:bg-slate-800 hover:shadow-lg active:scale-95'}`}
                         >
                             <ShoppingBag size={16} /> {isAdding ? 'Adicionado' : 'Comprar Agora'}
                         </button>
@@ -186,7 +186,7 @@ const Catalog = () => {
     });
 
     return (
-        <div ref={catalogRef} className="page-wrapper pt-32 px-6 md:px-12 lg:px-24 min-h-screen bg-background-light dark:bg-background-dark pb-24 transition-colors">
+        <div ref={catalogRef} className="page-wrapper pt-32 px-6 md:px-12 lg:px-24 min-h-screen bg-background-light dark:bg-background-dark pb-24 transition-colors bg-page-pattern">
             {/* Title Section */}
             <div className="mb-12 text-center md:text-left">
                 <h1 className="hero-serif text-5xl font-light italic text-slate-900 dark:text-slate-100 leading-tight">Catálogo</h1>
@@ -199,9 +199,9 @@ const Catalog = () => {
                     <button
                         key={cat}
                         onClick={() => setFilterCategory(cat)}
-                        className={`flex h-12 items-center justify-center rounded-full px-8 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 shadow-sm hover:shadow-md ${filterCategory === cat
-                            ? 'bg-primary border-primary text-white shadow-primary/20 hover:shadow-primary/30'
-                            : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:border-primary/50 hover:text-primary'
+                        className={`flex h-12 items-center justify-center rounded-full px-8 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 shadow-sm hover:shadow-md relative z-10 ${filterCategory === cat
+                            ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'
+                            : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-zinc-600 hover:text-slate-900 dark:hover:text-white'
                             } border`}
                     >
                         <p className="text-sm font-medium">{cat}</p>
@@ -214,14 +214,14 @@ const Catalog = () => {
                 <div className="flex gap-6">
                     <button
                         onClick={() => setSortBy(sortBy === 'preco_crescente' ? 'preco_decrescente' : 'preco_crescente')}
-                        className={`flex items-center gap-1 text-xs font-bold tracking-wider uppercase transition-colors ${sortBy.includes('preco') ? 'text-primary' : 'text-slate-400'}`}
+                        className={`flex items-center gap-1 text-xs font-bold tracking-wider uppercase transition-colors relative z-10 ${sortBy.includes('preco') ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}
                     >
                         Preço
                         <span className="material-symbols-outlined text-sm">unfold_more</span>
                     </button>
                     <button
                         onClick={() => setSortBy('recentes')}
-                        className={`flex items-center gap-1 text-xs font-bold tracking-wider uppercase transition-colors ${sortBy === 'recentes' ? 'text-primary' : 'text-slate-400'}`}
+                        className={`flex items-center gap-1 text-xs font-bold tracking-wider uppercase transition-colors relative z-10 ${sortBy === 'recentes' ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}
                     >
                         Recentes
                         <span className="material-symbols-outlined text-sm">keyboard_arrow_down</span>

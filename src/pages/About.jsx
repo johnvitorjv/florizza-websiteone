@@ -108,7 +108,7 @@ const About = () => {
     ];
 
     return (
-        <div ref={pageRef} className="page-wrapper pt-32 px-6 md:px-12 lg:px-24 min-h-screen bg-background-light dark:bg-background-dark pb-24 transition-colors">
+        <div ref={pageRef} className="page-wrapper pt-32 px-6 md:px-12 lg:px-24 min-h-screen bg-background-light dark:bg-background-dark pb-24 transition-colors bg-page-pattern">
 
             {/* Minimalist Header */}
             <div className="mb-20 text-center md:text-left about-anim">

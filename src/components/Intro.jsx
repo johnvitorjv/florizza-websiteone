@@ -16,7 +16,7 @@ const Intro = ({ onComplete }) => {
                 onComplete: () => {
                     gsap.to(containerRef.current, {
                         opacity: 0,
-                        duration: 0.5,
+                        duration: 0.8,
                         ease: "power2.inOut",
                         onComplete: () => {
                             setIsVisible(false);
@@ -31,30 +31,49 @@ const Intro = ({ onComplete }) => {
             gsap.set([subtitleRef.current, phraseRef.current], { opacity: 0, y: 10 });
             gsap.set(glowRef.current, { scale: 0.8, opacity: 0 });
 
-            // Glow background
-            tl.to(glowRef.current, { scale: 1.3, opacity: 0.4, duration: 0.6, ease: "power2.out" }, 0);
+            // Glow background — gentle
+            tl.to(glowRef.current, { scale: 1.3, opacity: 0.3, duration: 0.8, ease: "power2.out" }, 0);
 
-            // Title entrance — fast
+            // Title entrance — smooth
             tl.to(titleRef.current, {
                 y: 0, opacity: 1, scale: 1, filter: "blur(0px)",
-                duration: 0.5, ease: "power3.out"
+                duration: 0.6, ease: "power3.out"
             }, 0.1);
 
-            // Shimmer pass — 2 passes, each ~0.8s = 1.6s total, starts at 0.4s
+            // Shimmer pass — SLOW, exactly 2 passes
+            // First pass: starts at 0.5s, duration 1.8s (slow sweep)
             tl.to(titleRef.current, {
                 backgroundPosition: "-200% center",
+                duration: 1.8,
+                ease: "sine.inOut",
+            }, 0.5);
+
+            // Second pass: reset position then sweep again (slow)
+            tl.set(titleRef.current, { backgroundPosition: "200% center" });
+            tl.to(titleRef.current, {
+                backgroundPosition: "-200% center",
+                duration: 2,
+                ease: "sine.inOut",
+            });
+
+            // After second pass, transition title to solid text (shimmer fades out)
+            tl.to(titleRef.current, {
+                backgroundImage: 'linear-gradient(to right, rgba(115,207,23,1) 0%, rgba(115,207,23,1) 100%)',
                 duration: 0.8,
-                ease: "power1.inOut",
-                repeat: 1
-            }, 0.4);
+                ease: "power2.out",
+            });
 
-            // Subtitle + phrase
+            // Subtitle + phrase appear during the second shimmer pass
             tl.to([subtitleRef.current, phraseRef.current], {
-                opacity: 1, y: 0, duration: 0.4, stagger: 0.15, ease: "power2.out"
-            }, 0.6);
+                opacity: 1, y: 0, duration: 0.6, stagger: 0.2, ease: "power2.out"
+            }, "-=2.5");
 
-            // Brief hold so user sees it
-            tl.to({}, { duration: 0.5 });
+            // Gentle glow pulse and fade
+            tl.to(glowRef.current, { opacity: 0.1, scale: 1.5, duration: 1.2, ease: "power2.inOut" }, "-=1.5");
+
+            // Brief hold so user sees the final state
+            tl.to({}, { duration: 0.6 });
+
         }, containerRef);
 
         return () => ctx.revert();
@@ -70,7 +89,7 @@ const Intro = ({ onComplete }) => {
             <div
                 ref={glowRef}
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] pointer-events-none mix-blend-normal dark:mix-blend-screen"
-                style={{ background: 'radial-gradient(circle, rgba(115,207,23,0.3) 0%, rgba(115,207,23,0) 70%)' }}
+                style={{ background: 'radial-gradient(circle, rgba(115,207,23,0.25) 0%, rgba(115,207,23,0) 70%)' }}
             />
             <div className="relative z-10 flex flex-col items-center justify-center text-center px-6">
                 <div ref={titleWrapperRef} className="overflow-hidden pb-4">
@@ -78,7 +97,7 @@ const Intro = ({ onComplete }) => {
                         ref={titleRef}
                         className="font-display text-5xl md:text-7xl lg:text-8xl tracking-[0.2em] font-bold mb-2 text-transparent bg-clip-text"
                         style={{
-                            backgroundImage: 'linear-gradient(to right, rgba(115,207,23,1) 0%, rgba(115,207,23,0.4) 45%, rgba(255,255,255,1) 50%, rgba(115,207,23,0.4) 55%, rgba(115,207,23,1) 100%)',
+                            backgroundImage: 'linear-gradient(to right, rgba(115,207,23,1) 0%, rgba(115,207,23,0.3) 42%, rgba(255,255,255,0.95) 50%, rgba(115,207,23,0.3) 58%, rgba(115,207,23,1) 100%)',
                             backgroundSize: '200% auto',
                             color: 'transparent'
                         }}

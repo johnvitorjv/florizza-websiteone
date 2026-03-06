@@ -67,6 +67,11 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
+/* ═══════════════════════════════════════════════════════
+   LUXURY BACKGROUND PATTERNS
+   ═══════════════════════════════════════════════════════ */
+
+/* ── V1 Home Dark ── */
 .dark .bg-luxury-pattern {
   background-color: #070809;
   background-image:
@@ -87,4 +92,77 @@
   inset: 0;
   background: radial-gradient(circle at 50% 50%, rgba(13, 17, 23, 0) 0%, rgba(7, 8, 9, 0.8) 100%);
   pointer-events: none;
+}
+
+/* ── V1 Home Light ── subtle geometric with hint of green ── */
+.bg-luxury-pattern-light {
+  background-color: #F9F8F6;
+  background-image:
+    linear-gradient(30deg, rgba(115, 207, 23, 0.03) 12%, transparent 12.5%, transparent 87%, rgba(115, 207, 23, 0.03) 87.5%),
+    linear-gradient(150deg, rgba(115, 207, 23, 0.03) 12%, transparent 12.5%, transparent 87%, rgba(115, 207, 23, 0.03) 87.5%),
+    linear-gradient(60deg, rgba(115, 207, 23, 0.02) 25%, transparent 25.5%, transparent 75%, rgba(115, 207, 23, 0.02) 75%);
+  background-size: 80px 140px;
+  background-position: 0 0, 40px 70px, 0 0;
+  position: relative;
+}
+
+.bg-luxury-pattern-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, transparent 0%, rgba(249, 248, 246, 0.6) 100%);
+  pointer-events: none;
+}
+
+/* Override: hide light pattern in dark mode */
+.dark .bg-luxury-pattern-light {
+  background-image: none;
+  background-color: transparent;
+}
+
+/* ── Page Background Pattern (Catalog/About) — Light ── */
+.bg-page-pattern {
+  position: relative;
+}
+
+.bg-page-pattern::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(115, 207, 23, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(115, 207, 23, 0.03) 0%, transparent 50%);
+}
+
+/* Very subtle grid lines in light mode */
+.bg-page-pattern::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(90deg, rgba(115, 207, 23, 1) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(115, 207, 23, 1) 1px, transparent 1px);
+  background-size: 120px 120px;
+}
+
+/* ── Page Background Pattern — Dark ── */
+.dark .bg-page-pattern::before {
+  opacity: 0.3;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(115, 207, 23, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(115, 207, 23, 0.04) 0%, transparent 40%);
+}
+
+.dark .bg-page-pattern::after {
+  opacity: 0.03;
+  background-image:
+    linear-gradient(90deg, rgba(115, 207, 23, 0.6) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(115, 207, 23, 0.6) 1px, transparent 1px);
+  background-size: 120px 120px;
 }
