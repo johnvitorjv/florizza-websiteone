@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
@@ -19,10 +19,10 @@ const AppRoutes = ({ toggleDark, isDark }) => {
     return !sessionStorage.getItem('florizza-intro-seen');
   });
 
-  const handleIntroComplete = () => {
+  const handleIntroComplete = useCallback(() => {
     sessionStorage.setItem('florizza-intro-seen', 'true');
     setShowIntro(false);
-  };
+  }, []);
 
   if (showIntro) {
     return <Intro onComplete={handleIntroComplete} />;

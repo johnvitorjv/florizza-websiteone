@@ -10,74 +10,76 @@ const Intro = ({ onComplete }) => {
     const phraseRef = useRef(null);
     const [isVisible, setIsVisible] = useState(true);
 
+    const onCompleteRef = useRef(onComplete);
     useEffect(() => {
+        onCompleteRef.current = onComplete;
+    }, [onComplete]);
+
+    useEffect(() => {
+        let hasCompleted = false;
+
         const ctx = gsap.context(() => {
             const tl = gsap.timeline({
                 onComplete: () => {
+                    if (hasCompleted) return;
+                    hasCompleted = true;
                     gsap.to(containerRef.current, {
                         opacity: 0,
-                        duration: 0.8,
-                        ease: "power2.inOut",
+                        duration: 0.5,
+                        ease: "power3.inOut",
                         onComplete: () => {
                             setIsVisible(false);
-                            if (onComplete) onComplete();
+                            if (onCompleteRef.current) onCompleteRef.current();
                         }
                     });
                 }
             });
 
             gsap.set(titleWrapperRef.current, { autoAlpha: 1 });
-            gsap.set(titleRef.current, { y: 40, opacity: 0, scale: 0.97, filter: "blur(6px)", backgroundPosition: "200% center" });
-            gsap.set([subtitleRef.current, phraseRef.current], { opacity: 0, y: 10 });
+            gsap.set(titleRef.current, { y: 30, opacity: 0, scale: 0.95, filter: "blur(5px)", backgroundPosition: "200% center" });
+            gsap.set([subtitleRef.current, phraseRef.current], { opacity: 0, y: 15 });
             gsap.set(glowRef.current, { scale: 0.8, opacity: 0 });
 
-            // Glow background — gentle
-            tl.to(glowRef.current, { scale: 1.3, opacity: 0.3, duration: 0.8, ease: "power2.out" }, 0);
-
-            // Title entrance — smooth
+            // Entrance
+            tl.to(glowRef.current, { scale: 1.2, opacity: 0.25, duration: 0.8, ease: "power2.out" }, 0);
             tl.to(titleRef.current, {
                 y: 0, opacity: 1, scale: 1, filter: "blur(0px)",
-                duration: 0.6, ease: "power3.out"
+                duration: 0.7, ease: "power3.out"
             }, 0.1);
 
-            // Shimmer pass — SLOW, exactly 2 passes
-            // First pass: starts at 0.5s, duration 1.8s (slow sweep)
+            // Shimmer Pass 1 (Fast & Elegant)
             tl.to(titleRef.current, {
                 backgroundPosition: "-200% center",
-                duration: 1.8,
-                ease: "sine.inOut",
-            }, 0.5);
+                duration: 1.2,
+                ease: "power1.inOut",
+            }, 0.3);
 
-            // Second pass: reset position then sweep again (slow)
+            // Shimmer Pass 2
             tl.set(titleRef.current, { backgroundPosition: "200% center" });
             tl.to(titleRef.current, {
                 backgroundPosition: "-200% center",
-                duration: 2,
-                ease: "sine.inOut",
+                duration: 1.2,
+                ease: "power1.inOut",
             });
 
-            // After second pass, transition title to solid text (shimmer fades out)
+            // Transition to solid text and reveal subtitles instantly after the 2 passes
             tl.to(titleRef.current, {
                 backgroundImage: 'linear-gradient(to right, rgba(115,207,23,1) 0%, rgba(115,207,23,1) 100%)',
-                duration: 0.8,
+                duration: 0.4,
                 ease: "power2.out",
             });
 
-            // Subtitle + phrase appear during the second shimmer pass
             tl.to([subtitleRef.current, phraseRef.current], {
-                opacity: 1, y: 0, duration: 0.6, stagger: 0.2, ease: "power2.out"
-            }, "-=2.5");
+                opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "power2.out"
+            }, "-=0.3");
 
-            // Gentle glow pulse and fade
-            tl.to(glowRef.current, { opacity: 0.1, scale: 1.5, duration: 1.2, ease: "power2.inOut" }, "-=1.5");
-
-            // Brief hold so user sees the final state
-            tl.to({}, { duration: 0.6 });
+            // Pause slightly so the user registers the final brand visual before fading out
+            tl.to({}, { duration: 0.5 });
 
         }, containerRef);
 
         return () => ctx.revert();
-    }, [onComplete]);
+    }, []);
 
     if (!isVisible) return null;
 
