@@ -1,0 +1,27 @@
+{
+  "name": "FLORIZZA",
+  "short_name": "Florizza",
+  "description": "Elegância que traduz quem você é — catálogo, favoritos e compras da FLORIZZA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0A0A0A",
+  "background_color": "#F9F8F6",
+  "lang": "pt-BR",
+  "categories": ["shopping", "fashion", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

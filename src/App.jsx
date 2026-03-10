@@ -8,6 +8,7 @@ import About from './pages/About';
 import ProductDetails from './pages/ProductDetails';
 import Checkout from './pages/Checkout';
 import CartDrawer from './components/CartDrawer';
+import InstallPrompt from './components/InstallPrompt';
 import { ProductProvider, useProducts } from './context/ProductContext';
 import Intro from './components/Intro';
 
@@ -50,6 +51,7 @@ const AppRoutes = ({ toggleDark, isDark }) => {
         <Route path="/sobre" element={<About />} />
       </Routes>
       <CartDrawer />
+      <InstallPrompt />
     </>
   );
 };
