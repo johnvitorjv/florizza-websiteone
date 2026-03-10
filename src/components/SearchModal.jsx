@@ -9,39 +9,41 @@ const SearchModal = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const inputRef = useRef(null);
+    const panelRef = useRef(null);
     const overlayRef = useRef(null);
-    const contentRef = useRef(null);
-    const lineRef = useRef(null);
-    const suggestionRefs = useRef([]);
+    const resultsRef = useRef(null);
 
-    const topSearches = categories.slice(0, 5);
+    const topSearches = categories.slice(0, 4);
 
     useEffect(() => {
         if (isOpen) {
-            gsap.to(overlayRef.current, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' });
-            gsap.fromTo(contentRef.current,
-                { y: 40, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: 0.15 }
+            // Animate overlay (just for clicking outside)
+            gsap.to(overlayRef.current, { autoAlpha: 1, duration: 0.3, ease: 'power2.out' });
+
+            // Animate panel opening (slide down & fade)
+            gsap.fromTo(panelRef.current,
+                { y: -15, opacity: 0, scale: 0.98 },
+                { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: 'power3.out' }
             );
-            gsap.fromTo(lineRef.current,
-                { scaleX: 0 },
-                { scaleX: 1, duration: 1, ease: 'power3.inOut', delay: 0.3 }
-            );
-            if (suggestionRefs.current.length > 0) {
-                gsap.fromTo(suggestionRefs.current.filter(Boolean),
-                    { y: 12, opacity: 0 },
-                    { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: 'power2.out', delay: 0.5 }
+
+            // Stagger in content if there are results
+            if (resultsRef.current && resultsRef.current.children) {
+                gsap.fromTo(resultsRef.current.children,
+                    { y: 10, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.3, stagger: 0.05, ease: 'power2.out', delay: 0.1 }
                 );
             }
-            document.body.style.overflow = 'hidden';
-            setTimeout(() => inputRef.current?.focus(), 500);
+
+            // Focus input immediately but smoothly
+            setTimeout(() => inputRef.current?.focus(), 100);
         } else {
-            gsap.to(overlayRef.current, { autoAlpha: 0, duration: 0.4, ease: 'power2.in' });
-            gsap.to(contentRef.current, { y: -20, opacity: 0, duration: 0.3, ease: 'power2.in' });
-            document.body.style.overflow = '';
-            setTimeout(() => setSearchTerm(''), 400);
+            // Animate out
+            gsap.to(overlayRef.current, { autoAlpha: 0, duration: 0.2, ease: 'power2.in' });
+            gsap.to(panelRef.current, {
+                y: -10, opacity: 0, scale: 0.98, duration: 0.25, ease: 'power2.in',
+                onComplete: () => setSearchTerm('')
+            });
         }
-        return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
 
     const filteredProducts = searchTerm.length > 1
@@ -65,128 +67,121 @@ const SearchModal = ({ isOpen, onClose }) => {
     return (
         <div
             ref={overlayRef}
-            className="fixed inset-0 z-[90] invisible opacity-0"
-            onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
+            className={`fixed inset-0 z-[85] invisible ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+            style={{ opacity: 0 }}
         >
-            {/* Backdrop with subtle blur */}
-            <div className="absolute inset-0 bg-[#F9F8F6]/97 dark:bg-[#0A0A0A]/97 backdrop-blur-2xl" />
+            {/* Invisible backdrop just to catch clicks outside */}
+            <div
+                className="absolute inset-0 cursor-default"
+                onClick={onClose}
+                aria-label="Close search"
+            />
 
-            {/* Content Container — perfectly centered */}
-            <div className="relative z-10 h-full flex flex-col items-center justify-start pt-[12vh] md:pt-[15vh] px-6 overflow-y-auto">
-
-                {/* Close Button — top right, minimal */}
-                <button
-                    onClick={onClose}
-                    className="fixed top-6 right-6 md:top-8 md:right-8 z-50 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-300 hover:bg-slate-100 dark:hover:bg-white/5 group"
-                >
-                    <X size={20} strokeWidth={1.5} className="group-hover:rotate-90 transition-transform duration-500" />
-                </button>
-
-                {/* Search Content */}
-                <div ref={contentRef} className="w-full max-w-xl flex flex-col items-center">
-
-                    {/* Minimal label */}
-                    <span className="text-[9px] uppercase tracking-[0.5em] text-slate-400 dark:text-slate-500 font-semibold mb-8">
-                        Pesquisar
-                    </span>
-
-                    {/* Input Area */}
-                    <div className="relative w-full flex items-center group">
-                        <Search className="absolute left-0 w-5 h-5 text-slate-300 dark:text-zinc-600 group-focus-within:text-slate-800 dark:group-focus-within:text-white transition-colors duration-300" strokeWidth={1.5} />
+            {/* Floating Search Panel */}
+            <div
+                ref={panelRef}
+                className="absolute top-[70px] md:top-[85px] right-4 md:right-12 lg:right-20 w-[calc(100vw-32px)] md:w-[420px] max-h-[80vh] overflow-hidden flex flex-col bg-[#F9F8F6]/95 dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 rounded-2xl shadow-2xl z-10 opacity-0 transform-gpu"
+            >
+                {/* Search Input Area */}
+                <div className="flex-shrink-0 px-5 pt-5 pb-3 border-b border-slate-200/50 dark:border-zinc-800/80">
+                    <div className="relative flex items-center group">
+                        <Search className="absolute left-0 w-4 h-4 text-slate-400 group-focus-within:text-slate-800 dark:text-zinc-500 dark:group-focus-within:text-white transition-colors" strokeWidth={1.5} />
 
                         <input
                             ref={inputRef}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="O que você procura?"
-                            className="w-full bg-transparent text-center text-xl md:text-2xl font-light tracking-wide text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-zinc-600 focus:outline-none py-4 px-10 font-display"
+                            className="w-full bg-transparent text-sm md:text-base text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-zinc-600 focus:outline-none pl-8 pr-8 font-light tracking-wide font-display"
                         />
 
                         {searchTerm && (
-                            <button onClick={() => setSearchTerm('')} className="absolute right-0 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
-                                <X size={18} strokeWidth={1.5} />
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-0 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors"
+                            >
+                                <X size={14} strokeWidth={2} />
                             </button>
                         )}
                     </div>
+                </div>
 
-                    {/* Elegant underline */}
-                    <div className="w-full h-px bg-slate-200/60 dark:bg-zinc-800/80 relative">
-                        <div ref={lineRef} className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-400 dark:via-slate-500 to-transparent origin-center scale-x-0"></div>
-                    </div>
-
-                    {/* Content Below */}
-                    <div className="mt-12 md:mt-16 w-full max-w-2xl pb-20">
-                        {searchTerm.length < 2 ? (
-                            /* Suggestions */
-                            <div className="flex flex-col items-center text-center">
-                                <h3 className="text-[9px] uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500 font-semibold mb-8">
-                                    Termos Frequentes
-                                </h3>
-                                <div className="flex flex-wrap justify-center gap-3">
-                                    {topSearches.map((term, i) => (
-                                        <button
-                                            key={i}
-                                            ref={el => suggestionRefs.current[i] = el}
-                                            onClick={() => handleSuggestionClick(term)}
-                                            className="px-6 py-2.5 rounded-full border border-slate-200 dark:border-zinc-800 text-[11px] font-medium tracking-[0.15em] uppercase text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-800 dark:hover:text-white transition-all duration-300 bg-transparent hover:bg-slate-50 dark:hover:bg-white/5"
-                                        >
-                                            {term}
-                                        </button>
-                                    ))}
-                                </div>
+                {/* Scrollable Results Area */}
+                <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
+                    {searchTerm.length < 2 ? (
+                        /* Suggestions State */
+                        <div className="pb-2">
+                            <h3 className="text-[10px] uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 font-bold mb-4">
+                                Termos Frequentes
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {topSearches.map((term, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleSuggestionClick(term)}
+                                        className="px-4 py-1.5 rounded-full border border-slate-200 dark:border-zinc-800 text-[10px] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors bg-white/50 dark:bg-black/20"
+                                    >
+                                        {term}
+                                    </button>
+                                ))}
                             </div>
-                        ) : (
-                            /* Results */
-                            <div className="animate-fade-in">
-                                <h3 className="text-[9px] uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500 font-semibold mb-8 text-center">
-                                    {filteredProducts.length > 0
-                                        ? `${filteredProducts.length} resultado${filteredProducts.length > 1 ? 's' : ''}`
-                                        : 'Nenhum resultado'}
-                                </h3>
-
-                                {filteredProducts.length > 0 ? (
-                                    <div className="flex flex-col gap-1">
-                                        {filteredProducts.map((product, i) => (
-                                            <button
-                                                key={product.id}
-                                                onClick={() => handleProductClick(product.id)}
-                                                className="w-full flex items-center gap-5 p-4 rounded-2xl hover:bg-slate-100/80 dark:hover:bg-white/5 transition-all duration-300 group text-left"
-                                                style={{ animationDelay: `${i * 0.08}s` }}
-                                            >
-                                                <div className="w-16 h-20 rounded-lg overflow-hidden bg-slate-100 dark:bg-zinc-800 flex-shrink-0">
+                        </div>
+                    ) : (
+                        /* Results State */
+                        <div ref={resultsRef} className="flex flex-col gap-1 pb-2">
+                            {filteredProducts.length > 0 ? (
+                                <>
+                                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 font-bold mb-3">
+                                        Resultados ({filteredProducts.length})
+                                    </h3>
+                                    {filteredProducts.map((product) => (
+                                        <button
+                                            key={product.id}
+                                            onClick={() => handleProductClick(product.id)}
+                                            className="w-full flex items-center justify-between p-2.5 -mx-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group text-left"
+                                        >
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="w-10 h-12 rounded-md overflow-hidden bg-slate-100 dark:bg-zinc-800 flex-shrink-0">
                                                     <img
                                                         src={product.images[0]}
                                                         alt={product.name}
-                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                     />
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 font-semibold mb-1">{product.category}</p>
-                                                    <h4 className="font-display text-base text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors leading-tight truncate">{product.name}</h4>
-                                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
-                                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
-                                                    </p>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="font-display text-[13px] text-slate-900 dark:text-slate-200 group-hover:text-slate-600 dark:group-hover:text-white transition-colors truncate leading-tight">
+                                                        {product.name}
+                                                    </h4>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-[9px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-medium">
+                                                            {product.category}
+                                                        </span>
+                                                        <span className="w-0.5 h-0.5 rounded-full bg-slate-300 dark:bg-zinc-700"></span>
+                                                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <ArrowRight size={16} className="text-slate-300 dark:text-zinc-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
-                                            </button>
-                                        ))}
+                                            </div>
+                                            <ArrowRight size={14} className="text-slate-300 dark:text-zinc-600 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all flex-shrink-0 ml-2" />
+                                        </button>
+                                    ))}
+                                </>
+                            ) : (
+                                <div className="py-6 flex flex-col items-center justify-center text-center">
+                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-3">
+                                        <Search size={14} className="text-slate-400 dark:text-slate-500" strokeWidth={1.5} />
                                     </div>
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                                        <div className="w-12 h-12 rounded-full border border-slate-200 dark:border-zinc-800 flex items-center justify-center mb-6">
-                                            <Search size={18} className="text-slate-300 dark:text-zinc-600" strokeWidth={1.5} />
-                                        </div>
-                                        <p className="font-display text-lg text-slate-800 dark:text-slate-200 mb-2">
-                                            Nenhuma peça encontrada.
-                                        </p>
-                                        <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs leading-relaxed">
-                                            Tente usar palavras mais curtas ou navegue pelo nosso catálogo completo.
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                                    <p className="font-display text-sm text-slate-800 dark:text-slate-300">
+                                        Nenhuma peça encontrada.
+                                    </p>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-1 max-w-[200px]">
+                                        Tente navegar pelas categorias do catálogo.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
